@@ -1,4 +1,5 @@
-import React, { useState, useMemo } from "react";
+import { useState } from "react";
+import { genSolverSpots } from "./solverSpots";
 
 /* ================== THEME ================== */
 const T = {
@@ -112,158 +113,11 @@ function genRFISpot() {
   };
 }
 
-/* ================== CURATED POSTFLOP SPOTS ================== */
-const CURATED = [
-  {
-    kind: "flop", title: "The range bet", sub: "BTN vs BB · single-raised pot · 100bb",
-    heroPos: "BTN", heroCards: ["As", "5s"], board: ["Kd", "7c", "2h"], pot: 5.5,
-    history: ["You open 2.5bb on the BTN, BB calls.", "Flop K♦7♣2♥. BB checks."],
-    options: [
-      { label: "Check", freq: 18 },
-      { label: "Bet 33% pot", freq: 72 },
-      { label: "Bet 75% pot", freq: 10 },
-    ],
-    explain: "K72 rainbow is one of the biggest range-advantage boards for the raiser: you have all the AK, KK, AA combos and BB has almost none. Solvers bet nearly the entire range for a small size here. A5s specifically has a backdoor flush draw, a gutshot-adjacent wheel draw, and an ace overcard, so it bets even more often than the range average.",
-  },
-  {
-    kind: "flop", title: "Low boards hit the caller", sub: "BTN vs BB · single-raised pot · 100bb",
-    heroPos: "BTN", heroCards: ["Ac", "Kd"], board: ["6s", "5s", "4h"], pot: 5.5,
-    history: ["You open 2.5bb on the BTN, BB calls.", "Flop 6♠5♠4♥. BB checks."],
-    options: [
-      { label: "Check", freq: 52 },
-      { label: "Bet 33% pot", freq: 38 },
-      { label: "Bet 100% pot", freq: 10 },
-    ],
-    explain: "Connected low boards smash the BB's calling range: they have all the 78, 32, sets of 4s-6s, and two pairs you can't have. Your range advantage is gone, so AK high checks back at high frequency. Betting here 'because you raised preflop' is the classic over-cbet leak.",
-  },
-  {
-    kind: "flop", title: "Check-raise the draw", sub: "BB vs BTN · single-raised pot · 100bb",
-    heroPos: "BB", heroCards: ["9h", "8h"], board: ["7d", "6c", "2s"], pot: 5.5,
-    history: ["BTN opens 2.5bb, you defend the BB.", "You check, BTN bets 33% pot (1.8bb)."],
-    options: [
-      { label: "Fold", freq: 0 },
-      { label: "Call", freq: 55 },
-      { label: "Check-raise to 7bb", freq: 45 },
-    ],
-    explain: "98s here is an open-ended straight draw with backdoor flush potential, which is exactly the hand class solvers love to check-raise: huge equity when called, plus fold equity now. Pure folding a hand with 8 clean outs against a small bet would be a disaster. Both call and raise are fine; raise builds the pot for when you get there.",
-  },
-  {
-    kind: "river", title: "Pot odds, not feelings", sub: "BB vs CO · single-raised pot",
-    heroPos: "BB", heroCards: ["Ac", "Jd"], board: ["Js", "8d", "3c", "2h", "6s"], pot: 18,
-    history: ["You defend BB vs a CO open, call flop bet with top pair.", "Turn and river check through to the river, where CO bets 75% pot (13.5bb)."],
-    options: [
-      { label: "Fold", freq: 20 },
-      { label: "Call", freq: 80 },
-      { label: "Raise", freq: 0 },
-    ],
-    explain: "Versus 75% pot you need about 30% equity to call. AJ is top pair top kicker on a runout where CO's delayed bet line includes plenty of missed gutshots and worse jacks going thin. Folding the near-top of your bluff-catching range here massively overfolds; solvers defend this combo almost always.",
-  },
-  {
-    kind: "turn", title: "Barrel the nut draw", sub: "CO vs BB · single-raised pot",
-    heroPos: "CO", heroCards: ["Ah", "Qh"], board: ["Jh", "7h", "3s", "2d"], pot: 11,
-    history: ["You open CO, BB calls. You bet 33% on the flop, BB calls.", "Turn 2♦. BB checks."],
-    options: [
-      { label: "Check back", freq: 25 },
-      { label: "Bet 75% pot", freq: 70 },
-      { label: "Bet 150% pot", freq: 5 },
-    ],
-    explain: "Nut flush draw plus two overcards is the perfect barrel: around 12-15 outs of real equity, plus fold equity against BB's weak pairs. Hands with this much equity when called want to bet big. Checking back keeps the pot small with a hand that wants it large.",
-  },
-  {
-    kind: "flop", title: "3-bet pot, dry king", sub: "SB vs BTN · 3-bet pot · 100bb",
-    heroPos: "SB", heroCards: ["As", "Kc"], board: ["Kh", "7d", "2c"], pot: 22,
-    history: ["BTN opens 2.5bb, you 3-bet to 10bb from the SB, BTN calls.", "Flop K♥7♦2♣. You are first to act."],
-    options: [
-      { label: "Check", freq: 17 },
-      { label: "Bet 33% pot", freq: 78 },
-      { label: "Bet 75% pot", freq: 5 },
-    ],
-    explain: "In 3-bet pots the stack-to-pot ratio is low and your 3-betting range crushes a K-high dry board. Solvers bet small with virtually the whole range, and AK is happy to start building the pot immediately. Big sizing is unnecessary when villain can't continue with much anyway.",
-  },
-  {
-    kind: "flop", title: "Multiway discipline", sub: "HJ vs CO and BB · 3-way pot",
-    heroPos: "HJ", heroCards: ["Kd", "Jd"], board: ["Js", "8h", "4c"], pot: 8.5,
-    history: ["You open HJ, CO and BB both call.", "BB checks, action on you with CO still behind."],
-    options: [
-      { label: "Check", freq: 45 },
-      { label: "Bet 33% pot", freq: 45 },
-      { label: "Bet 75% pot", freq: 10 },
-    ],
-    explain: "Multiway, everyone's equity drops and someone is much more likely to have you beat or be sticking around. Solvers cut betting frequency hard with one-pair hands, even top pair good kicker. Mixing checks here protects your checking range and avoids bloating pots with a hand that hates raises.",
-  },
-  {
-    kind: "river", title: "Facing the overbet", sub: "BB vs BTN · single-raised pot",
-    heroPos: "BB", heroCards: ["Th", "8h"], board: ["Ts", "9s", "4d", "Kd", "2c"], pot: 14,
-    history: ["You defend BB vs BTN, call flop and turn bets with middle pair.", "River 2♣. You check, BTN overbets 150% pot (21bb)."],
-    options: [
-      { label: "Fold", freq: 85 },
-      { label: "Call", freq: 15 },
-    ],
-    explain: "Overbets are polarized: nutted hands and bluffs, almost nothing in between. Second pair with no key blockers (you don't block the missed spade or diamond draws... actually you block nothing relevant) sits near the bottom of your bluff catchers. Solvers fold this at high frequency and reserve calls for hands that block value or unblock bluffs.",
-  },
-  {
-    kind: "river", title: "Polar value sizing", sub: "BTN vs BB · single-raised pot",
-    heroPos: "BTN", heroCards: ["4c", "4d"], board: ["Kc", "Qd", "4h", "8s", "2h"], pot: 24,
-    history: ["You open BTN, BB calls. You bet flop and turn, BB calls both.", "River 2♥. BB checks."],
-    options: [
-      { label: "Check back", freq: 10 },
-      { label: "Bet 60% pot", freq: 30 },
-      { label: "Overbet 150% pot", freq: 60 },
-    ],
-    explain: "Bottom set on a brick runout beats everything BB can realistically hold after calling two streets (KQ, Kx, draws that got there... none did). When your hand is at the top of your range and villain's range is capped, solvers go huge. Betting small with the near-nuts is the most common value-sizing leak in low stakes games.",
-  },
-  {
-    kind: "flop", title: "Paired board pressure", sub: "BTN vs BB · single-raised pot",
-    heroPos: "BTN", heroCards: ["6h", "5h"], board: ["Ts", "Td", "4c"], pot: 5.5,
-    history: ["You open BTN, BB calls.", "Flop T♠T♦4♣. BB checks."],
-    options: [
-      { label: "Check", freq: 40 },
-      { label: "Bet 33% pot", freq: 60 },
-    ],
-    explain: "Paired boards favor the raiser: BB folds a ton immediately, and trips are rare for both players. Small bets with high frequency print here. 65s adds backdoor straight and flush equity, so it bets a bit above range average. Just don't get attached if you face resistance.",
-  },
-  {
-    kind: "flop", title: "Facing a donk bet", sub: "BTN vs BB · single-raised pot",
-    heroPos: "BTN", heroCards: ["As", "Qd"], board: ["Qh", "Jh", "9c"], pot: 5.5,
-    history: ["You open BTN, BB calls.", "Flop Q♥J♥9♣. BB leads (donk bets) 33% pot into you."],
-    options: [
-      { label: "Fold", freq: 5 },
-      { label: "Call", freq: 55 },
-      { label: "Raise to 6bb", freq: 40 },
-    ],
-    explain: "BB donk leads show up on boards that hit their range, and QJ9 two-tone is one of them: they have all the T8, K T, 99 type hands. But top pair top kicker is way too strong to fold and strong enough to raise for value and protection on a board this wet. Calling keeps their bluffs in; raising charges the draws. Both are solver-approved.",
-  },
-  {
-    kind: "flop", title: "Slowplay or raise?", sub: "BB vs BTN · single-raised pot",
-    heroPos: "BB", heroCards: ["7d", "7c"], board: ["Ks", "7h", "2d"], pot: 5.5,
-    history: ["BTN opens 2.5bb, you defend the BB.", "You check, BTN bets 33% pot (1.8bb)."],
-    options: [
-      { label: "Fold", freq: 0 },
-      { label: "Call", freq: 70 },
-      { label: "Raise to 6bb", freq: 30 },
-    ],
-    explain: "Middle set on a bone-dry board: there are no draws to charge and almost no turn card hurts you. Solvers mostly call to keep BTN's air and weak hands bluffing on later streets, mixing in raises so the check-raising range isn't all bluffs and draws. On wet boards this flips and sets raise much more often.",
-  },
-  {
-    kind: "turn", title: "Probe the turn", sub: "BB vs CO · single-raised pot",
-    heroPos: "BB", heroCards: ["Td", "9d"], board: ["8s", "6c", "2h", "Th"], pot: 5.5,
-    history: ["CO opens, you defend the BB.", "You check the flop, CO checks back.", "Turn T♥. You are first to act."],
-    options: [
-      { label: "Check", freq: 30 },
-      { label: "Bet 66% pot", freq: 70 },
-    ],
-    explain: "When the preflop raiser checks back the flop, their range is capped: the big overpairs and top pairs mostly would have bet. Now you turned top pair with a gutshot. Solvers attack checked-back ranges aggressively with these 'probe' bets, both for value and because villain folds a ton.",
-  },
-  {
-    kind: "river", title: "Bluff with the busted draw", sub: "BTN vs BB · single-raised pot",
-    heroPos: "BTN", heroCards: ["Qh", "Jh"], board: ["Kh", "9h", "4c", "8s", "2d"], pot: 11,
-    history: ["You open BTN, BB calls. You bet 33% on the flop, BB calls.", "Turn 8♠ checks through. River 2♦. BB checks."],
-    options: [
-      { label: "Check back", freq: 30 },
-      { label: "Bet 75% pot", freq: 70 },
-    ],
-    explain: "QJ high has zero showdown value, which makes it a natural bluff: when you can't win by checking, betting only needs to work sometimes. It also blocks KQ and KJ, the top pairs most likely to call you. Busted draws are the backbone of every solver's river bluffing range. The hands that check back here are ones with some showdown value, like ace high.",
-  },
+/* ================== CURATED PREFLOP SPOTS ==================
+ * Hand-written preflop spots, kept as-is. The curated *postflop* spots that
+ * used to live here have moved to real solver output (see solverSpots.js /
+ * genSolverSpots), so only these preflop ones remain hardcoded. */
+const CURATED_PREFLOP = [
   {
     kind: "preflop", title: "The squeeze", sub: "BB vs BTN open + SB call · 100bb",
     heroPos: "BB", heroCards: ["Ks", "Qs"], board: [], pot: 6.5,
@@ -296,39 +150,6 @@ const CURATED = [
       { label: "4-bet to 20bb", freq: 35 },
     ],
     explain: "A5s is the textbook 4-bet bluff: the ace blocks AA and AK (villain is less likely to have a hand that continues), and when called you still have wheel straight and nut flush potential. Solvers split this combo three ways almost evenly. The hands that pure-fold here are the dominated offsuit broadways, not the suited wheel aces.",
-  },
-  {
-    kind: "river", title: "Raise your rivered nuts", sub: "BB vs BTN · single-raised pot",
-    heroPos: "BB", heroCards: ["6c", "5c"], board: ["7d", "4h", "2s", "Kc", "3d"], pot: 9,
-    history: ["You defend BB vs BTN, check-call a 33% flop bet.", "Turn K♣ checks through. River 3♦ gives you the straight.", "You check, BTN bets 60% pot (5.4bb)."],
-    options: [
-      { label: "Fold", freq: 0 },
-      { label: "Call", freq: 25 },
-      { label: "Raise to 3x", freq: 75 },
-    ],
-    explain: "You rivered a disguised straight on a card that looks like a brick to villain. When they finally bet after showing weakness, their range has plenty of Kx that just got there on the turn and will pay off a raise. Flatting the near-nuts against a capped betting range leaves money on the table. Raise big.",
-  },
-  {
-    kind: "flop", title: "Way ahead or way behind", sub: "BB vs BTN · single-raised pot",
-    heroPos: "BB", heroCards: ["Ac", "Qd"], board: ["Ad", "2s", "2c"], pot: 5.5,
-    history: ["BTN opens 2.5bb, you defend the BB.", "You check, BTN bets 33% pot (1.8bb)."],
-    options: [
-      { label: "Fold", freq: 0 },
-      { label: "Call", freq: 80 },
-      { label: "Raise to 6bb", freq: 20 },
-    ],
-    explain: "Classic way-ahead-way-behind: you either crush their bluffs and worse aces, or you're dead to A2/22/AK. There are no draws to charge, so raising mostly folds out the hands you beat and stacks chips in against the hands that beat you. Call down and let them keep barreling worse.",
-  },
-  {
-    kind: "turn", title: "The ace rolls off", sub: "BTN vs BB · single-raised pot",
-    heroPos: "BTN", heroCards: ["Kd", "Qc"], board: ["Qs", "7h", "2c", "Ad"], pot: 9,
-    history: ["You open BTN, BB calls. You bet 33% with top pair, BB calls.", "Turn A♦. BB checks."],
-    options: [
-      { label: "Check back", freq: 65 },
-      { label: "Bet 33% pot", freq: 25 },
-      { label: "Bet 75% pot", freq: 10 },
-    ],
-    explain: "The ace demoted you from top pair to a bluff catcher. Betting now folds out everything you beat and gets called by Ax that has you crushed. Your hand still has decent showdown value and position, so the solver mostly checks back to realize it. Knowing when a scare card flips your hand class is a core turn skill.",
   },
 ];
 
@@ -490,7 +311,7 @@ function TablePanel({ spot }) {
           You: <b style={{ color: T.brass }}>{spot.heroPos}</b>
         </span>
         <span style={{ fontSize: 12, letterSpacing: "0.12em", textTransform: "uppercase", color: T.creamDim }}>
-          Pot: <b style={{ color: T.cream }}>{spot.pot}bb</b>
+          Pot: <b style={{ color: T.cream }}>{spot.pot}{spot.solver ? " chips" : "bb"}</b>
         </span>
       </div>
 
@@ -566,7 +387,12 @@ function RangeChart() {
 
 /* ================== LESSON LOGIC ================== */
 function buildLesson() {
-  const curated = shuffle(CURATED).slice(0, 3);
+  // The 3 "curated" slots now draw from a pool of real solver-derived river
+  // spots plus the hand-written curated preflop spots, matching the old
+  // behavior where each slot could be either. genSolverSpots samples a fresh
+  // decision point + combo per spot, so they vary lesson to lesson.
+  const curatedPool = [...genSolverSpots(6), ...CURATED_PREFLOP];
+  const curated = shuffle(curatedPool).slice(0, 3);
   const gen = Array.from({ length: 3 }, genRFISpot);
   const drills = [pick([genPotOddsDrill, genMDFDrill])(), genDrawDrill()];
   return shuffle([...curated, ...gen, ...drills]);
@@ -666,7 +492,7 @@ export default function App() {
               boxShadow: `0 5px 0 ${T.brassDeep}`,
             }}>Start today's lesson</button>
             <div style={{ marginTop: 26, fontSize: 12, color: T.creamDim, opacity: 0.8 }}>
-              Frequencies approximated from common solver outputs (6-max cash, 100bb). Borderline mixes are rounded.
+              River spots use real CFR solver output (computed offline); preflop and drills use standard charts and exact math. Frequencies shown as whole percents.
             </div>
           </div>
         )}
