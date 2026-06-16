@@ -155,7 +155,17 @@ const CURATED_PREFLOP = [
 
 /* ================== GENERATED MATH DRILLS ================== */
 const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
-const shuffle = (arr) => [...arr].sort(() => Math.random() - 0.5);
+// Fisher-Yates: an unbiased shuffle. (A .sort() with a random comparator is
+// NOT uniform -- it favors leaving elements near their original position,
+// which skewed both curated-spot selection and lesson question order.)
+const shuffle = (arr) => {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+};
 
 function genPotOddsDrill() {
   const pot = pick([6, 8, 10, 12, 16, 20]);

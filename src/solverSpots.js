@@ -19,7 +19,16 @@
 import solverData from "./lesson_strategies.json";
 
 const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
-const shuffle = (arr) => [...arr].sort(() => Math.random() - 0.5);
+// Fisher-Yates: an unbiased shuffle (a .sort() with a random comparator is not
+// uniform). Returns a new array; the input is left untouched.
+const shuffle = (arr) => {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+};
 
 /* Suit symbols for explain-text only; the table renders cards itself. */
 const SUIT_SYM = { s: "♠", h: "♥", d: "♦", c: "♣" };
@@ -86,14 +95,16 @@ function explainFor(spot, comboName, comboData, options) {
 /* All quizzable (hero, historyKey) decision points of one spot: those where
  * at least one combo actually reaches the node under equilibrium play.
  * Combos flagged reached:false carry a meaningless uniform placeholder
- * strategy, so they are excluded from sampling entirely. */
+ * strategy, so they are excluded from sampling entirely.
+ *
+ * Only OOP nodes are returned because every spot's description is written
+ * from OOP's perspective. Serving IP nodes would show the user the villain's
+ * narrative. Full IP perspective support is a future enhancement. */
 function quizzableNodes(spot) {
   const nodes = [];
-  for (const hero of ["OOP", "IP"]) {
-    for (const [historyKey, table] of Object.entries(spot.strategies[hero])) {
-      const combos = Object.keys(table).filter((c) => table[c].reached);
-      if (combos.length > 0) nodes.push({ hero, historyKey, combos });
-    }
+  for (const [historyKey, table] of Object.entries(spot.strategies["OOP"])) {
+    const combos = Object.keys(table).filter((c) => table[c].reached);
+    if (combos.length > 0) nodes.push({ hero: "OOP", historyKey, combos });
   }
   return nodes;
 }
