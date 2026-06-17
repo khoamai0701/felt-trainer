@@ -591,6 +591,67 @@ export default function App() {
                 </div>
               ))}
             </div>
+
+            {/* Review Mistakes — shows every spot answered wrong or partial (freq < 50%). */}
+            {(() => {
+              const mistakes = results.filter((r) => r.tier !== "best");
+              return (
+                <div style={{ textAlign: "left", maxWidth: 480, margin: "0 auto 26px" }}>
+                  <div style={{ fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: T.creamDim, marginBottom: 10 }}>
+                    Review mistakes
+                  </div>
+                  {mistakes.length === 0 ? (
+                    <div style={{ fontSize: 13.5, color: T.creamDim, fontStyle: "italic", textAlign: "center", padding: "14px 0" }}>
+                      No mistakes this lesson ✓
+                    </div>
+                  ) : (
+                    <div style={{ maxHeight: 560, overflowY: "auto", display: "grid", gap: 20, paddingRight: 2 }}>
+                      {mistakes.map((r, idx) => {
+                        const chosenLabel = r.spot.options[r.choice].label;
+                        const badgeColor = r.tier === "wrong" ? T.red : T.brass;
+                        return (
+                          <div key={idx} style={{
+                            background: "rgba(255,255,255,0.04)", border: `1px solid ${T.feltLine}`,
+                            borderRadius: 14, padding: "14px 14px 16px",
+                          }}>
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+                              <span style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 15, fontWeight: 800, color: T.cream }}>
+                                {r.spot.title}
+                              </span>
+                              <span style={{ fontWeight: 800, fontSize: 15, color: badgeColor }}>
+                                {r.tier === "wrong" ? "✗" : "≈"}
+                              </span>
+                            </div>
+                            <TablePanel spot={r.spot} />
+                            <div style={{ marginTop: 10, fontSize: 13, color: T.creamDim }}>
+                              You chose: <b style={{ color: badgeColor }}>{chosenLabel}</b>
+                            </div>
+                            {!r.spot.quiz ? (
+                              <div style={{ background: "rgba(0,0,0,0.25)", borderRadius: 10, padding: "12px 14px", marginTop: 10 }}>
+                                <div style={{ fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: T.creamDim, marginBottom: 8 }}>
+                                  Solver frequencies
+                                </div>
+                                {r.spot.options.map((o, j) => (
+                                  <FreqBar key={j} label={o.label} freq={o.freq} chosen={j === r.choice} />
+                                ))}
+                              </div>
+                            ) : (
+                              <div style={{ marginTop: 8, fontSize: 13, color: T.creamDim }}>
+                                Correct answer: <b style={{ color: T.green }}>{r.spot.options.find((o) => o.freq === 100)?.label}</b>
+                              </div>
+                            )}
+                            <p style={{ fontSize: 13.5, lineHeight: 1.65, color: T.cream, opacity: 0.88, margin: "10px 0 0" }}>
+                              {r.spot.explain}
+                            </p>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
+
             <button onClick={start} style={{
               background: T.brass, color: T.ink, border: "none", borderRadius: 14,
               padding: "15px 40px", fontSize: 16, fontWeight: 800, cursor: "pointer",
