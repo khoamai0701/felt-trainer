@@ -182,6 +182,8 @@ function buildSpot(spot) {
     history: narrate(historyKey, hero),
     options,
     explain: explainFor(spot, comboName, comboData, options),
+    concept: spot.concept,
+    read_more: spot.read_more,
   };
 }
 
