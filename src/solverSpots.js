@@ -6,10 +6,12 @@
  *
  * Schema recap (see the solver repo's README for the full version):
  *   data.spots[].strategies[player][history][combo] =
- *       { strength, hand_class, reached, actions }
+ *       { strength, hand_class, semantic_strength, reached, actions }
  * where `player` is "OOP"/"IP", `history` is "root" or actions joined by "/"
  * (e.g. "check/bet 50"), `combo` is like "AsQs", and `actions` is a
- * frequency distribution that sums to 1.
+ * frequency distribution that sums to 1. `semantic_strength` is a board-aware
+ * label ("top_pair", "set", "overpair", ...) used to filter dealt combos to a
+ * spot's featured_hand_strength so the hand always matches the lesson concept.
  *
  * One solver spot contains ~10 decision points x ~25 combos, so instead of
  * hardcoding one hand per lesson, genSolverSpots() samples a fresh
@@ -63,7 +65,7 @@ function narrate(historyKey, hero) {
   const lines = historyKey.split("/").map((token, i) => {
     const actor = i % 2 === 0 ? "OOP" : "IP";
     const you = actor === hero;
-    const subject = you ? "You" : actor;
+    const subject = you ? "You" : "villain";
     const s = you ? "" : "s"; // "You check." vs "OOP checks."
     if (token === "check") return `${subject} check${s}.`;
     const [verb, pct] = token.split(" ");
@@ -109,10 +111,57 @@ function quizzableNodes(spot) {
   return nodes;
 }
 
+/* Human-friendly aliases accepted in a spot's featured_hand_strength, mapped to
+ * the canonical semantic_strength label the JSON carries. Kept in sync with
+ * precompute.py's FEATURED_ALIASES. */
+const FEATURED_ALIASES = { bluff: "high_card" };
+
+/* Within one decision node, the combos whose semantic_strength matches the
+ * spot's featured concept (e.g. only "top_pair" combos on a kicker-battle spot).
+ * Returns all combos when the spot names no featured strengths. */
+function featuredCombos(spot, hero, historyKey, combos) {
+  const featured = spot.featured_hand_strength || [];
+  if (featured.length === 0) return combos;
+  const wanted = new Set(featured.map((f) => FEATURED_ALIASES[f] || f));
+  const table = spot.strategies[hero][historyKey];
+  return combos.filter((c) => wanted.has(table[c].semantic_strength));
+}
+
 /* One solver spot -> one lesson object in the Train tab's existing format. */
 function buildSpot(spot) {
-  const { hero, historyKey, combos } = pick(quizzableNodes(spot));
-  const comboName = pick(combos);
+  // Prefer decision nodes that actually contain a combo of the featured concept
+  // so the dealt hand always matches the spot's title/lesson.
+  const nodes = quizzableNodes(spot).map((n) => ({
+    ...n,
+    matching: featuredCombos(spot, n.hero, n.historyKey, n.combos),
+  }));
+  const matchingNodes = nodes.filter((n) => n.matching.length > 0);
+
+  let node, comboPool;
+  if (matchingNodes.length > 0) {
+    node = pick(matchingNodes);
+    comboPool = node.matching;
+  } else {
+    // No node anywhere in this spot offers a combo of the featured strength --
+    // the spot is misconfigured. Fall back to the full pool so quizzing never
+    // breaks, but warn loudly so it is visible during development.
+    node = pick(nodes);
+    comboPool = node.combos;
+    const available = [
+      ...new Set(
+        node.combos.map((c) => spot.strategies[node.hero][node.historyKey][c].semantic_strength),
+      ),
+    ];
+    console.warn(
+      `[solverSpots] No combo matches featured_hand_strength ` +
+        `[${(spot.featured_hand_strength || []).join(", ")}] for spot "${spot.name}" ` +
+        `at node "${node.historyKey}". Available strengths: [${available.join(", ")}]. ` +
+        `Falling back to the full combo pool.`,
+    );
+  }
+
+  const { hero, historyKey } = node;
+  const comboName = pick(comboPool);
   const comboData = spot.strategies[hero][historyKey][comboName];
 
   // Frequencies arrive as 0..1 and the app works in whole percents.
@@ -125,7 +174,7 @@ function buildSpot(spot) {
     kind: "river",
     solver: true, // marks the spot as real solver data (vs hand-written)
     title: spot.name,
-    sub: `OOP vs IP · river · vanilla CFR, ${solverData.iterations} iterations`,
+    sub: `you vs villain · river · vanilla CFR, ${solverData.iterations} iterations`,
     heroPos: hero,
     heroCards: parseCombo(comboName),
     board: spot.board,
