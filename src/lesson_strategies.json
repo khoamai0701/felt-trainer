@@ -6,7 +6,7 @@
     {
       "id": "king-high-dry-range-advantage",
       "name": "King-high dry: range advantage",
-      "description": "Your range dominates villain's bluff-catching range on this dry king-high board \u2014 sets, overpairs, and top pairs all sit ahead of villain's capped holdings. Bet large and often; range advantage this clean means you can pressure with your entire value range.",
+      "description": "Your range dominates villain's bluff-catching range on this dry king-high board \u2014 sets, overpairs, and top pairs all sit ahead of villain's capped holdings. The solver leans toward checking to trap rather than leading: when villain bets into your checked range, raise large \u2014 your range advantage is best expressed through check-raises, not open bets.",
       "concept": "Range Advantage",
       "read_more": "Range advantage means your hand distribution is stronger than your opponent's on a specific board, giving you more strong hands relative to your overall range. Solvers exploit this by betting frequently and at larger sizes, since the opponent must defend a wide value range, not just the nuts. Failing to press range advantage \u2014 by checking too often or sizing too small \u2014 leaves significant EV on the table.",
       "featured_hand_strength": [
@@ -2878,7 +2878,7 @@
     {
       "id": "ace-high-dry-top-pair-kicker-battle",
       "name": "Ace-high dry: top-pair kicker battle",
-      "description": "Both you and villain hold aces here, so the kicker determines who wins. Bet small for thin value \u2014 you're ahead of weaker aces, but keep the size down to avoid building a big pot against a better kicker.",
+      "description": "Both you and villain hold aces here, so the kicker determines who wins. Villain's range of overpairs and sets is strong enough that checking is the dominant play \u2014 your weaker aces are bluff-catchers, not thin-value bets, and building the pot risks bloating it against a dominating hand.",
       "concept": "Kicker Battle",
       "read_more": "A kicker battle occurs when both players hold the same hand category and the winner is decided solely by the unpaired hole card. Solvers bet thin in these spots because the opponent's calling range holds the same category but weaker kickers, but sizing must stay small to avoid inflating the pot against the rare dominating hand. These are among the most common thin-value situations on ace-high or paired boards.",
       "featured_hand_strength": [
@@ -7971,7 +7971,7 @@
     {
       "id": "king-queen-broadway-dry",
       "name": "King-queen broadway dry",
-      "description": "Your range holds a nut advantage on this dry broadway board \u2014 top two pair and sets sit ahead of villain's weaker kings and second pair. Missed draws in your range have no showdown value, making them the natural bluffs to balance your value bets.",
+      "description": "Your range holds a nut advantage on this dry broadway board \u2014 top two pair and sets sit ahead of villain's weaker kings and second pair. The solver checks most hands to trap, including missed draws; when villain bets into your check, sets and two pair raise for value while missed draws fold \u2014 the lesson is check-then-raise, not open-betting.",
       "concept": "Polarization",
       "read_more": "A polarized betting range contains strong value hands and bluffs with few medium-strength holdings in between. Betting a polarized range forces the opponent into a binary decision \u2014 value or bluff \u2014 rather than letting them call comfortably with medium-strength hands. The bluff frequency in a balanced polarized range is set so the opponent is indifferent to calling: the bluff-to-value ratio mirrors the pot odds offered.",
       "featured_hand_strength": [
@@ -12478,7 +12478,7 @@
     {
       "id": "ace-high-dry-weak-ace-defense",
       "name": "Ace-high dry: weak-ace defense",
-      "description": "You hold a weak top pair on an ace-high board where villain's range includes stronger aces. Bet small to extract from the hands you beat and deny equity, without bloating the pot against a better ace.",
+      "description": "You hold a weak top pair on an ace-high board where villain's range includes stronger aces. Checking is the correct play \u2014 betting risks being raised off a hand that can't continue, while checking lets you control the pot size and bluff-catch against villain's c-bets with missed draws.",
       "concept": "Thin Value",
       "read_more": "Thin value betting means betting a hand that is only a small favorite against the opponent's calling range. The bet extracts chips from slightly worse hands that still call, while accepting the occasional loss to a better hand in villain's range. Sizing down is critical: a large bet for thin value folds out the weaker holdings you need to pay you off, turning a profitable spot into a break-even or losing one.",
       "featured_hand_strength": [
@@ -27168,7 +27168,7 @@
     {
       "id": "two-tone-king-board-top-pair",
       "name": "Two-tone king board: top pair",
-      "description": "The flush draw missed and your top pair or set is the dominant hand \u2014 villain's range is capped at second pair with no draw to hide behind. Value bet comfortably; villain is stuck calling with second pair or worse.",
+      "description": "The flush draw missed and your top pair or set leads this board \u2014 villain's range is capped at second pair with no draw to hide behind. Despite the advantage, the solver mostly checks to trap: sets and top pair let villain bluff before check-raising, which extracts more than a lead bet.",
       "concept": "Range Advantage",
       "read_more": "Range advantage means your hand distribution is stronger than your opponent's on a specific board, giving you more strong hands relative to your overall range. Solvers exploit this by betting frequently and at larger sizes, since the opponent must defend a wide value range, not just the nuts. Failing to press range advantage \u2014 by checking too often or sizing too small \u2014 leaves significant EV on the table.",
       "featured_hand_strength": [
@@ -39805,7 +39805,7 @@
     {
       "id": "kqj-broadway-straights-and-two-pair",
       "name": "KQJ broadway: straights and two pair",
-      "description": "On a K-Q-J board, the ace-ten broadway straight is the nuts and every strong hand below it \u2014 sets, overpairs, two pair \u2014 is a bluff-catcher against it. When you hold the straight, bet large; when villain raises on this board, the straight is heavily represented in their range.",
+      "description": "On a K-Q-J board, the ace-ten broadway straight is the nuts and every strong hand below it is a bluff-catcher against it. When you hold the straight, check to trap \u2014 it extracts far more by check-raising villain's bets than by leading; open-betting on this texture is a giveaway.",
       "concept": "Polarization",
       "read_more": "A polarized betting range contains strong value hands and bluffs with few medium-strength holdings in between. Betting a polarized range forces the opponent into a binary decision \u2014 value or bluff \u2014 rather than letting them call comfortably with medium-strength hands. The bluff frequency in a balanced polarized range is set so the opponent is indifferent to calling: the bluff-to-value ratio mirrors the pot odds offered.",
       "featured_hand_strength": [
@@ -41812,7 +41812,7 @@
     {
       "id": "ace-king-broadway-top-two-pair",
       "name": "Ace-king broadway: top two pair",
-      "description": "Your top two pair or set dominates this board and villain is capped at single pair \u2014 no flush or straight threatens you. Bet for value; villain's one-pair hands are bluff-catching, not trapping.",
+      "description": "Your set leads for value nearly every time, but top two pair mostly checks \u2014 it prefers to check-raise villain's bets rather than open-bet into potential sets lurking in villain's range. Range-split: bet the set, check AK and let villain turn weaker aces and kings into bluffs.",
       "concept": "Range Advantage",
       "read_more": "Range advantage means your hand distribution is stronger than your opponent's on a specific board, giving you more strong hands relative to your overall range. Solvers exploit this by betting frequently and at larger sizes, since the opponent must defend a wide value range, not just the nuts. Failing to press range advantage \u2014 by checking too often or sizing too small \u2014 leaves significant EV on the table.",
       "featured_hand_strength": [
@@ -48976,7 +48976,7 @@
     {
       "id": "low-jack-high-big-pairs-out-of-position",
       "name": "Low jack-high: big pairs out of position",
-      "description": "On this low, disconnected board your strong pairs are ahead of nearly everything villain holds \u2014 the board misses most of their range. Even underpairs extract thin value here; bet for what the board allows.",
+      "description": "On this low, disconnected board your strong pairs lead villain's range \u2014 but the solver checks virtually everything to trap. Overpairs and top pair check to induce bluffs from villain's missed overcards; underpairs are bluff-catchers here, not thin-value bets.",
       "concept": "Thin Value",
       "read_more": "Thin value betting means betting a hand that is only a small favorite against the opponent's calling range. The bet extracts chips from slightly worse hands that still call, while accepting the occasional loss to a better hand in villain's range. Sizing down is critical: a large bet for thin value folds out the weaker holdings you need to pay you off, turning a profitable spot into a break-even or losing one.",
       "featured_hand_strength": [
@@ -54837,7 +54837,7 @@
     {
       "id": "3-bet-pot-low-board-big-hands-vs-sets",
       "name": "3-bet pot, low board: big hands vs sets",
-      "description": "In a 3-bet pot on a low board, villain's range frequently contains flopped sets that crush your overpairs \u2014 the big pot makes those mistakes very costly. Value bet the nutted hands confidently, but respect a raise; villain's set is live on this texture.",
+      "description": "In a 3-bet pot on a low board, only your set bets with real frequency \u2014 overpairs and underpairs check almost universally, fearing villain's flopped sets in this inflated pot. Range-split cleanly: lead with the set, check-call with overpairs, and use underpairs as pure bluff-catchers when villain bets.",
       "concept": "Bluff Catching",
       "read_more": "Bluff catching means calling down with a hand that loses to all value bets but beats all bluffs. The decision is driven by pot odds and the estimated frequency villain bluffs: if villain bluffs more often than the break-even frequency implied by the pot odds, calling is profitable regardless of hand strength. Bluff catchers should rarely raise, because raising prices out the bluffs you're trying to capture and only gets called by better.",
       "featured_hand_strength": [
