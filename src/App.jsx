@@ -95,6 +95,17 @@ function genRFISpot() {
     else why = `${cls} is a fold here. Offsuit, weak high card, poor connectivity. Solvers fold this at 100% from ${POS_LABEL[pos]}; opening it just lights money on fire postflop out of position.`;
   }
 
+  let rfi_read_more;
+  if (inRange) {
+    if (f.pair) rfi_read_more = `Pocket pairs open from almost every position because set value is real — you flop a set about 12% of the time and tend to win a big pot when you do. ${cls} from ${POS_LABEL[pos]} has the raw equity to be a comfortable open.`;
+    else if (f.suited && f.hi >= RANKS.indexOf("T")) rfi_read_more = `${cls} opens from ${POS_LABEL[pos]} for both high-card strength and the flush equity that makes it hard to play against. It dominates weaker hands in calling ranges and makes well-disguised flushes that get paid off — a confident open.`;
+    else if (f.suited) rfi_read_more = `${cls} makes the ${POS_LABEL[pos]}'s ~${RFI[pos].pct}% range on suited connectivity — it flops draws and disguised straights that realize equity well in position. From UTG or the Hijack the same hand folds because those draws can't realize their value out of position.`;
+    else rfi_read_more = `${cls} opens from ${POS_LABEL[pos]} on raw high-card strength — at ~${RFI[pos].pct}%, the range here is wide enough for offsuit hands that hit top pair with a solid kicker. One spot earlier and it becomes a fold.`;
+  } else {
+    if (f.suited) rfi_read_more = `Even suited, ${cls} doesn't clear the ~${RFI[pos].pct}% bar from ${POS_LABEL[pos]} — it lacks either the high-card value or connectivity to be profitable here. From a later, wider position the math changes, but not from ${POS_LABEL[pos]}.`;
+    else rfi_read_more = `${cls} folds from ${POS_LABEL[pos]} because offsuit hands without strong high cards don't have the equity to open profitably — you'd be building a pot you can't win often enough. From a wider position this changes, but not here.`;
+  }
+
   return {
     kind: "preflop",
     title: "Open or fold?",
@@ -110,7 +121,7 @@ function genRFISpot() {
       { label: "Fold", freq: inRange ? 0 : 100 },
     ],
     concept: "Preflop Ranges",
-    read_more: "Raise-first-in (RFI) ranges are calibrated by position: earlier positions open fewer hands because more players act behind and can hold premium hands. A hand's position in the opening range reflects its raw equity, postflop playability, and ability to realize that equity when called. Deviating significantly from position-appropriate ranges — opening too wide or too tight — creates exploitable leaks that attentive opponents will find.",
+    read_more: rfi_read_more,
     explain: why + ` (Note: borderline combos mix in real solver output; this trainer rounds them to the dominant action.)`,
   };
 }
@@ -130,7 +141,7 @@ const CURATED_PREFLOP = [
       { label: "Squeeze to 11bb", freq: 55 },
     ],
     concept: "Squeeze Play",
-    read_more: "A squeeze play is a 3-bet made after a raise and at least one cold call, exploiting the dead money in the pot and the cold-caller's capped range. Cold callers typically don't have the strongest hands (those are usually 3-bet), so the squeeze often wins the pot outright. Squeezing for a large size maximizes equity captured from the dead money and denies the caller's implied odds.",
+    read_more: "KQs is too strong to just call here — the SB cold-caller's range is capped because they'd 3-bet their best hands, and there's 6.5bb of dead money in the middle already. Squeezing to 11bb makes their speculative holdings unprofitable to continue with and often wins the pot without seeing a flop.",
     explain: "With a raise and a call in front, there's dead money in the pot and the SB caller's range is capped (they'd usually 3-bet their best hands). KQs is strong enough to value-squeeze and plays fine when called. Flatting is also fine but invites a multiway pot out of position. Squeezing slightly more often is the solver lean.",
   },
   {
@@ -143,7 +154,7 @@ const CURATED_PREFLOP = [
       { label: "4-bet to 22bb", freq: 10 },
     ],
     concept: "3-bet Defense",
-    read_more: "Defending against 3-bets in position is more profitable than out of position because you realize more of your hand's equity by acting last on every postflop street. Suited connectors are ideal 3-bet defends: they flop draws and disguised made hands that have high implied odds against overpairs. Folding too wide to 3-bets makes you trivially exploitable by any player willing to 3-bet light.",
+    read_more: "T9s calls the 3-bet in position because it flops flush draws, open-enders, and disguised two pairs that overpairs struggle to play against. The key is acting last on every street from the BTN — that lets you take free cards, pot-control when behind, and build the pot when you're ahead. The same hand folds to a 3-bet from out of position because the equity doesn't realize without that advantage.",
     explain: "Suited connectors are premium 3-bet defends in position: you close the action, you're getting a decent price, and T9s flops draws and disguised monsters that crack overpairs. Folding all your suited connectors to 3-bets makes you trivially exploitable. The small 4-bet mix exists but is the least-used line.",
   },
   {
@@ -156,7 +167,7 @@ const CURATED_PREFLOP = [
       { label: "4-bet to 20bb", freq: 35 },
     ],
     concept: "4-bet Dynamics",
-    read_more: "4-bet ranges are typically polar: premium value hands at the top (AA, KK) and hands with strong blockers as bluffs (A5s, A4s). Ace-blocker hands are ideal 4-bet bluffs because the ace reduces the likelihood villain holds AA or AK, improving the fold equity of the 4-bet. The ratio of value 4-bets to bluffs should be calibrated so that villain is near-indifferent to 5-betting or folding their bluff-catchers.",
+    read_more: "A5s 4-bets here because the ace blocks AA and AK — the exact hands most likely to call or 5-bet you. When called, you still have real equity with a nut flush draw and a wheel straight draw, so it's not a pure bluff. That combination of blocker effect and backup equity is what makes this a 4-bet rather than a fold.",
     explain: "A5s is the textbook 4-bet bluff: the ace blocks AA and AK (villain is less likely to have a hand that continues), and when called you still have wheel straight and nut flush potential. Solvers split this combo three ways almost evenly. The hands that pure-fold here are the dominated offsuit broadways, not the suited wheel aces.",
   },
 ];
@@ -195,7 +206,7 @@ function genPotOddsDrill() {
     history: [`The pot is ${pot}bb on the river.`, `Villain bets ${bet}bb (${betLabel}).`, `What is the minimum equity you need to profitably call?`],
     options,
     concept: "Pot Odds",
-    read_more: "Pot odds express the ratio of your call size to the total pot after calling, giving you the minimum equity needed to break even on the call. If your equity exceeds the pot odds, calling is immediately profitable regardless of future action. The most common error is dividing the call by (pot + bet) instead of (pot + 2 × bet), which omits your own call from the final pot and overstates the required equity.",
+    read_more: `Villain bet ${bet}bb into a ${pot}bb pot — to call profitably, your hand needs to win at least ${req}% of the time. If you fold more often than that, you're surrendering calls that make money. The classic mistake is getting ${trap}%: that's bet ÷ (pot + bet), which forgets your own call also goes into the final pot.`,
     explain: `You call ${bet}bb to win the pot (${pot}bb) plus villain's bet (${bet}bb) plus your own call (${bet}bb). Required equity = bet ÷ (pot + 2 × bet) = ${bet} ÷ ${Math.round((pot + 2 * bet) * 10) / 10} ≈ ${req}%. The classic mistake is ${trap}% (bet ÷ (pot + bet)), which forgets your call also goes into the final pot.`,
   };
 }
@@ -222,7 +233,7 @@ function genMDFDrill() {
     history: [`The pot is ${pot}bb.`, `Villain bets ${bet}bb (${betLabel}).`, `What fraction of your range must continue so villain can't profit by bluffing any two cards?`],
     options,
     concept: "MDF",
-    read_more: "Minimum defense frequency (MDF) is the fraction of your range that must continue — by calling or raising — to prevent an opponent from profitably bluffing with any two cards. If you fold more than (1 − MDF) of the time, every bluff becomes an automatic profit regardless of hand strength. MDF scales with bet size: larger bets require you to fold more of your range, not less, because the bettor risks more to win the same pot.",
+    read_more: `If you fold more than ${alpha}% of the time facing this ${betLabel} bet, villain profits automatically — they don't need a real hand, the math just works. Defending at least ${mdf}% of your range (calls plus any raises) takes away that free money. In practice it means not over-folding your medium-strength hands; tighten beyond ${alpha}% and you're exploitable by anyone paying attention.`,
     explain: `MDF = pot ÷ (pot + bet) = ${pot} ÷ ${Math.round((pot + bet) * 10) / 10} ≈ ${mdf}%. If you fold more than ${alpha}% of the time, villain's bluffs print money automatically. MDF is a defensive baseline, not a strict rule: vs real players who under-bluff, you can fold more.`,
   };
 }
@@ -256,7 +267,7 @@ function genDrawDrill() {
         { label: "Fold", freq: callGood ? 0 : 100 },
       ]),
       concept: "Draw Equity",
-      read_more: "When all remaining streets are priced in simultaneously (e.g. a flop all-in), the call decision is purely a comparison of equity vs pot odds. With two cards to come, equity can be estimated with the rule of 4 (outs × 4%), though the exact figure is slightly lower for large out counts. Implied odds are irrelevant when there are no more betting rounds — only the immediate equity-vs-price calculation matters.",
+      read_more: `You have a ${t.name} — ${t.outs} outs with two cards to come is about ${eqPct}% equity. Villain shoved ${bet}bb into a ${pot}bb pot, so you need ${prPct}% to break even. Your ${eqPct}% ${callGood ? `beats that number, so folding is the mistake` : `falls short of that number, so calling is the mistake`} — draws are only as good as the price you're getting.`,
       explain: `${t.outs} outs with two cards to come ≈ ${eqPct}% equity (rule of 4 says ~${Math.min(t.outs * 4, 60)}%, the exact number is ${eqPct}%). You need ${bet} ÷ (${pot} + 2×${bet}) ≈ ${prPct}% to call. ${eqPct}% ${callGood ? ">" : "<"} ${prPct}%, so ${callGood ? "calling is clearly profitable. Equity is real money when stacks are in." : "this is a clear fold. Draws are only as good as the price you're getting."}`,
     };
   }
