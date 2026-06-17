@@ -109,6 +109,8 @@ function genRFISpot() {
       { label: "Limp", freq: 0 },
       { label: "Fold", freq: inRange ? 0 : 100 },
     ],
+    concept: "Preflop Ranges",
+    read_more: "Raise-first-in (RFI) ranges are calibrated by position: earlier positions open fewer hands because more players act behind and can hold premium hands. A hand's position in the opening range reflects its raw equity, postflop playability, and ability to realize that equity when called. Deviating significantly from position-appropriate ranges — opening too wide or too tight — creates exploitable leaks that attentive opponents will find.",
     explain: why + ` (Note: borderline combos mix in real solver output; this trainer rounds them to the dominant action.)`,
   };
 }
@@ -127,6 +129,8 @@ const CURATED_PREFLOP = [
       { label: "Call", freq: 45 },
       { label: "Squeeze to 11bb", freq: 55 },
     ],
+    concept: "Squeeze Play",
+    read_more: "A squeeze play is a 3-bet made after a raise and at least one cold call, exploiting the dead money in the pot and the cold-caller's capped range. Cold callers typically don't have the strongest hands (those are usually 3-bet), so the squeeze often wins the pot outright. Squeezing for a large size maximizes equity captured from the dead money and denies the caller's implied odds.",
     explain: "With a raise and a call in front, there's dead money in the pot and the SB caller's range is capped (they'd usually 3-bet their best hands). KQs is strong enough to value-squeeze and plays fine when called. Flatting is also fine but invites a multiway pot out of position. Squeezing slightly more often is the solver lean.",
   },
   {
@@ -138,6 +142,8 @@ const CURATED_PREFLOP = [
       { label: "Call", freq: 65 },
       { label: "4-bet to 22bb", freq: 10 },
     ],
+    concept: "3-bet Defense",
+    read_more: "Defending against 3-bets in position is more profitable than out of position because you realize more of your hand's equity by acting last on every postflop street. Suited connectors are ideal 3-bet defends: they flop draws and disguised made hands that have high implied odds against overpairs. Folding too wide to 3-bets makes you trivially exploitable by any player willing to 3-bet light.",
     explain: "Suited connectors are premium 3-bet defends in position: you close the action, you're getting a decent price, and T9s flops draws and disguised monsters that crack overpairs. Folding all your suited connectors to 3-bets makes you trivially exploitable. The small 4-bet mix exists but is the least-used line.",
   },
   {
@@ -149,6 +155,8 @@ const CURATED_PREFLOP = [
       { label: "Call", freq: 35 },
       { label: "4-bet to 20bb", freq: 35 },
     ],
+    concept: "4-bet Dynamics",
+    read_more: "4-bet ranges are typically polar: premium value hands at the top (AA, KK) and hands with strong blockers as bluffs (A5s, A4s). Ace-blocker hands are ideal 4-bet bluffs because the ace reduces the likelihood villain holds AA or AK, improving the fold equity of the 4-bet. The ratio of value 4-bets to bluffs should be calibrated so that villain is near-indifferent to 5-betting or folding their bluff-catchers.",
     explain: "A5s is the textbook 4-bet bluff: the ace blocks AA and AK (villain is less likely to have a hand that continues), and when called you still have wheel straight and nut flush potential. Solvers split this combo three ways almost evenly. The hands that pure-fold here are the dominated offsuit broadways, not the suited wheel aces.",
   },
 ];
@@ -186,6 +194,8 @@ function genPotOddsDrill() {
     pot,
     history: [`The pot is ${pot}bb on the river.`, `Villain bets ${bet}bb (${betLabel}).`, `What is the minimum equity you need to profitably call?`],
     options,
+    concept: "Pot Odds",
+    read_more: "Pot odds express the ratio of your call size to the total pot after calling, giving you the minimum equity needed to break even on the call. If your equity exceeds the pot odds, calling is immediately profitable regardless of future action. The most common error is dividing the call by (pot + bet) instead of (pot + 2 × bet), which omits your own call from the final pot and overstates the required equity.",
     explain: `You call ${bet}bb to win the pot (${pot}bb) plus villain's bet (${bet}bb) plus your own call (${bet}bb). Required equity = bet ÷ (pot + 2 × bet) = ${bet} ÷ ${Math.round((pot + 2 * bet) * 10) / 10} ≈ ${req}%. The classic mistake is ${trap}% (bet ÷ (pot + bet)), which forgets your call also goes into the final pot.`,
   };
 }
@@ -211,6 +221,8 @@ function genMDFDrill() {
     pot,
     history: [`The pot is ${pot}bb.`, `Villain bets ${bet}bb (${betLabel}).`, `What fraction of your range must continue so villain can't profit by bluffing any two cards?`],
     options,
+    concept: "MDF",
+    read_more: "Minimum defense frequency (MDF) is the fraction of your range that must continue — by calling or raising — to prevent an opponent from profitably bluffing with any two cards. If you fold more than (1 − MDF) of the time, every bluff becomes an automatic profit regardless of hand strength. MDF scales with bet size: larger bets require you to fold more of your range, not less, because the bettor risks more to win the same pot.",
     explain: `MDF = pot ÷ (pot + bet) = ${pot} ÷ ${Math.round((pot + bet) * 10) / 10} ≈ ${mdf}%. If you fold more than ${alpha}% of the time, villain's bluffs print money automatically. MDF is a defensive baseline, not a strict rule: vs real players who under-bluff, you can fold more.`,
   };
 }
@@ -243,6 +255,8 @@ function genDrawDrill() {
         { label: "Call", freq: callGood ? 100 : 0 },
         { label: "Fold", freq: callGood ? 0 : 100 },
       ]),
+      concept: "Draw Equity",
+      read_more: "When all remaining streets are priced in simultaneously (e.g. a flop all-in), the call decision is purely a comparison of equity vs pot odds. With two cards to come, equity can be estimated with the rule of 4 (outs × 4%), though the exact figure is slightly lower for large out counts. Implied odds are irrelevant when there are no more betting rounds — only the immediate equity-vs-price calculation matters.",
       explain: `${t.outs} outs with two cards to come ≈ ${eqPct}% equity (rule of 4 says ~${Math.min(t.outs * 4, 60)}%, the exact number is ${eqPct}%). You need ${bet} ÷ (${pot} + 2×${bet}) ≈ ${prPct}% to call. ${eqPct}% ${callGood ? ">" : "<"} ${prPct}%, so ${callGood ? "calling is clearly profitable. Equity is real money when stacks are in." : "this is a clear fold. Draws are only as good as the price you're getting."}`,
     };
   }
@@ -281,6 +295,32 @@ function FreqBar({ label, freq, chosen }) {
       <div style={{ height: 10, background: "rgba(255,255,255,0.08)", borderRadius: 5, overflow: "hidden" }}>
         <div style={{ width: `${freq}%`, height: "100%", borderRadius: 5, background: chosen ? T.brass : "rgba(246,241,227,0.45)", transition: "width 600ms ease" }} />
       </div>
+    </div>
+  );
+}
+
+/* ================== READ MORE ================== */
+// Collapsible textbook blurb shown only in the mistake-review section.
+function ReadMore({ text }) {
+  const [open, setOpen] = useState(false);
+  if (!text) return null;
+  return (
+    <div style={{ marginTop: 8 }}>
+      <button
+        onClick={() => setOpen((o) => !o)}
+        style={{
+          background: "none", border: "none", padding: 0, cursor: "pointer",
+          fontSize: 12, color: T.creamDim, fontFamily: "'Space Grotesk', sans-serif",
+          textDecoration: "underline", textDecorationStyle: "dotted",
+        }}
+      >
+        {open ? "Read less ↑" : "Read more ↓"}
+      </button>
+      {open && (
+        <p style={{ fontSize: 13, lineHeight: 1.6, color: T.creamDim, margin: "8px 0 0", fontStyle: "italic" }}>
+          {text}
+        </p>
+      )}
     </div>
   );
 }
@@ -555,6 +595,16 @@ export default function App() {
                     Answer: <b style={{ color: T.cream }}>{spot.options.find((o) => o.freq === 100)?.label}</b>
                   </div>
                 )}
+                {spot.concept && (
+                  <div style={{
+                    display: "inline-block", marginBottom: 8,
+                    fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase",
+                    background: "rgba(216,169,61,0.12)", border: "1px solid rgba(216,169,61,0.28)",
+                    color: T.brass, borderRadius: 999, padding: "3px 10px",
+                  }}>
+                    {spot.concept}
+                  </div>
+                )}
                 <p style={{ fontSize: 14.5, lineHeight: 1.65, color: T.cream, opacity: 0.92 }}>{spot.explain}</p>
                 <button onClick={next} style={{
                   marginTop: 12, width: "100%", background: T.brass, color: T.ink, border: "none",
@@ -643,6 +693,7 @@ export default function App() {
                             <p style={{ fontSize: 13.5, lineHeight: 1.65, color: T.cream, opacity: 0.88, margin: "10px 0 0" }}>
                               {r.spot.explain}
                             </p>
+                            <ReadMore text={r.spot.read_more} />
                           </div>
                         );
                       })}

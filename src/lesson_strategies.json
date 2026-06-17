@@ -7,6 +7,8 @@
       "id": "king-high-dry-range-advantage",
       "name": "King-high dry: range advantage",
       "description": "Your range dominates villain's bluff-catching range on this dry king-high board \u2014 sets, overpairs, and top pairs all sit ahead of villain's capped holdings. Bet large and often; range advantage this clean means you can pressure with your entire value range.",
+      "concept": "Range Advantage",
+      "read_more": "Range advantage means your hand distribution is stronger than your opponent's on a specific board, giving you more strong hands relative to your overall range. Solvers exploit this by betting frequently and at larger sizes, since the opponent must defend a wide value range, not just the nuts. Failing to press range advantage \u2014 by checking too often or sizing too small \u2014 leaves significant EV on the table.",
       "featured_hand_strength": [
         "overpair",
         "set",
@@ -2877,6 +2879,8 @@
       "id": "ace-high-dry-top-pair-kicker-battle",
       "name": "Ace-high dry: top-pair kicker battle",
       "description": "Both you and villain hold aces here, so the kicker determines who wins. Bet small for thin value \u2014 you're ahead of weaker aces, but keep the size down to avoid building a big pot against a better kicker.",
+      "concept": "Kicker Battle",
+      "read_more": "A kicker battle occurs when both players hold the same hand category and the winner is decided solely by the unpaired hole card. Solvers bet thin in these spots because the opponent's calling range holds the same category but weaker kickers, but sizing must stay small to avoid inflating the pot against the rare dominating hand. These are among the most common thin-value situations on ace-high or paired boards.",
       "featured_hand_strength": [
         "top_pair"
       ],
@@ -5367,6 +5371,8 @@
       "id": "queen-high-dry-two-pair-value",
       "name": "Queen-high dry: two-pair value",
       "description": "Your two pair or set is the clear value hand on this disconnected board, and missed straight draws become natural bluffs with no showdown value. Polarize your betting range \u2014 bet large with your value and bluffs and let villain's top pair make a tough call.",
+      "concept": "Polarization",
+      "read_more": "A polarized betting range contains strong value hands and bluffs with few medium-strength holdings in between. Betting a polarized range forces the opponent into a binary decision \u2014 value or bluff \u2014 rather than letting them call comfortably with medium-strength hands. The bluff frequency in a balanced polarized range is set so the opponent is indifferent to calling: the bluff-to-value ratio mirrors the pot odds offered.",
       "featured_hand_strength": [
         "two_pair",
         "set"
@@ -7318,6 +7324,8 @@
       "id": "king-queen-broadway-dry",
       "name": "King-queen broadway dry",
       "description": "Your range holds a nut advantage on this dry broadway board \u2014 top two pair and sets sit ahead of villain's weaker kings and second pair. Missed draws in your range have no showdown value, making them the natural bluffs to balance your value bets.",
+      "concept": "Polarization",
+      "read_more": "A polarized betting range contains strong value hands and bluffs with few medium-strength holdings in between. Betting a polarized range forces the opponent into a binary decision \u2014 value or bluff \u2014 rather than letting them call comfortably with medium-strength hands. The bluff frequency in a balanced polarized range is set so the opponent is indifferent to calling: the bluff-to-value ratio mirrors the pot odds offered.",
       "featured_hand_strength": [
         "two_pair",
         "set",
@@ -8946,6 +8954,8 @@
       "id": "jack-high-dry-thin-value",
       "name": "Jack-high dry: thin value",
       "description": "Top pair is a thin value hand on this low board, but villain's weaker jacks and underpairs will call a small bet and fold to a large one. Size down to extract from the hands that pay you off.",
+      "concept": "Thin Value",
+      "read_more": "Thin value betting means betting a hand that is only a small favorite against the opponent's calling range. The bet extracts chips from slightly worse hands that still call, while accepting the occasional loss to a better hand in villain's range. Sizing down is critical: a large bet for thin value folds out the weaker holdings you need to pay you off, turning a profitable spot into a break-even or losing one.",
       "featured_hand_strength": [
         "top_pair"
       ],
@@ -10085,6 +10095,8 @@
       "id": "ten-high-dry-top-set-value",
       "name": "Ten-high dry: top set value",
       "description": "Your set is the dominant value hand on this ten-high board \u2014 well ahead of villain's weaker tens and pairs. Bet large to maximize extraction; the overcard hands that missed are the natural bluffs to balance your sizing.",
+      "concept": "Thin Value",
+      "read_more": "Thin value betting means betting a hand that is only a small favorite against the opponent's calling range. The bet extracts chips from slightly worse hands that still call, while accepting the occasional loss to a better hand in villain's range. Sizing down is critical: a large bet for thin value folds out the weaker holdings you need to pay you off, turning a profitable spot into a break-even or losing one.",
       "featured_hand_strength": [
         "set"
       ],
@@ -11819,6 +11831,8 @@
       "id": "ace-high-dry-weak-ace-defense",
       "name": "Ace-high dry: weak-ace defense",
       "description": "You hold a weak top pair on an ace-high board where villain's range includes stronger aces. Bet small to extract from the hands you beat and deny equity, without bloating the pot against a better ace.",
+      "concept": "Thin Value",
+      "read_more": "Thin value betting means betting a hand that is only a small favorite against the opponent's calling range. The bet extracts chips from slightly worse hands that still call, while accepting the occasional loss to a better hand in villain's range. Sizing down is critical: a large bet for thin value folds out the weaker holdings you need to pay you off, turning a profitable spot into a break-even or losing one.",
       "featured_hand_strength": [
         "top_pair"
       ],
@@ -13022,6 +13036,8 @@
       "id": "paired-aces-kicker-war",
       "name": "Paired aces: kicker war",
       "description": "On a paired-aces board, everyone has trip aces \u2014 the pot goes to the better kicker or full house. Value bet with confidence when yours is at the top; villain's weaker trips are stuck paying you off or folding.",
+      "concept": "Kicker Battle",
+      "read_more": "A kicker battle occurs when both players hold the same hand category and the winner is decided solely by the unpaired hole card. Solvers bet thin in these spots because the opponent's calling range holds the same category but weaker kickers, but sizing must stay small to avoid inflating the pot against the rare dominating hand. These are among the most common thin-value situations on ace-high or paired boards.",
       "featured_hand_strength": [
         "trips",
         "full_house",
@@ -14650,6 +14666,8 @@
       "id": "paired-sixes-full-house-and-big-pairs",
       "name": "Paired sixes: full house and big pairs",
       "description": "Your full house completely dominates villain's one-pair range on this paired-six board. Bet large; villain's kings and pairs have to call without any ability to fight back.",
+      "concept": "Nut Advantage",
+      "read_more": "Nut advantage means holding a disproportionate share of the strongest possible hands on a given board. A player with nut advantage can bet large and frequently because even when called by strong hands, the opponent cannot raise without maximum exposure to the nuts. This advantage is most pronounced on flush and paired boards, where one player's range connects far more strongly with the runout.",
       "featured_hand_strength": [
         "full_house",
         "quads",
@@ -16980,6 +16998,8 @@
       "id": "paired-kings-trips-vs-underpair",
       "name": "Paired kings: trips vs underpair",
       "description": "Your trip kings are ahead of every pocket pair villain holds \u2014 they're all underpairs to the board pair. Choose a small size for thin value from underpairs or a large size to apply pressure.",
+      "concept": "Thin Value",
+      "read_more": "Thin value betting means betting a hand that is only a small favorite against the opponent's calling range. The bet extracts chips from slightly worse hands that still call, while accepting the occasional loss to a better hand in villain's range. Sizing down is critical: a large bet for thin value folds out the weaker holdings you need to pay you off, turning a profitable spot into a break-even or losing one.",
       "featured_hand_strength": [
         "trips",
         "full_house"
@@ -18877,6 +18897,8 @@
       "id": "board-pairs-eights-boats-freeze-pairs",
       "name": "Board pairs eights: boats freeze pairs",
       "description": "The river pairing the eight reshuffled the hand rankings \u2014 full houses and quads jumped to the top, making formerly strong hands like top two pair into bluff-catchers. Recognize the shift: what was a value hand before the river may now be a call.",
+      "concept": "Polarization",
+      "read_more": "A polarized betting range contains strong value hands and bluffs with few medium-strength holdings in between. Betting a polarized range forces the opponent into a binary decision \u2014 value or bluff \u2014 rather than letting them call comfortably with medium-strength hands. The bluff frequency in a balanced polarized range is set so the opponent is indifferent to calling: the bluff-to-value ratio mirrors the pot odds offered.",
       "featured_hand_strength": [
         "full_house",
         "quads",
@@ -20937,6 +20959,8 @@
       "id": "trips-on-board-kicker-plays",
       "name": "Trips on board: kicker plays",
       "description": "When the board shows trips, everyone holds at least trip fours \u2014 the pot goes to the best kicker or full house. Value bet when your full house or kicker beats the calling range; check when villain's kickers have you at a disadvantage.",
+      "concept": "Kicker Battle",
+      "read_more": "A kicker battle occurs when both players hold the same hand category and the winner is decided solely by the unpaired hole card. Solvers bet thin in these spots because the opponent's calling range holds the same category but weaker kickers, but sizing must stay small to avoid inflating the pot against the rare dominating hand. These are among the most common thin-value situations on ace-high or paired boards.",
       "featured_hand_strength": [
         "full_house",
         "trips"
@@ -22834,6 +22858,8 @@
       "id": "3-bet-pot-paired-queens-full-house-vs-trips",
       "name": "3-bet pot, paired queens: full house vs trips",
       "description": "In this bloated 3-bet pot, your jacks full is a premium hand, but villain's slow-played trip queens lurk in the calling range. Bet for value, but respect large raises \u2014 villain's trips show up in the range more often than it feels.",
+      "concept": "Nut Advantage",
+      "read_more": "Nut advantage means holding a disproportionate share of the strongest possible hands on a given board. A player with nut advantage can bet large and frequently because even when called by strong hands, the opponent cannot raise without maximum exposure to the nuts. This advantage is most pronounced on flush and paired boards, where one player's range connects far more strongly with the runout.",
       "featured_hand_strength": [
         "full_house",
         "two_pair",
@@ -25056,6 +25082,8 @@
       "id": "two-tone-broadway-brick-two-pair-value",
       "name": "Two-tone broadway brick: two-pair value",
       "description": "The flush draw bricked, leaving your top two pair or set as the clear value hand and your missed draws as the natural bluffs. Villain can't have a flush and is deciding whether one pair is worth calling your bet.",
+      "concept": "Polarization",
+      "read_more": "A polarized betting range contains strong value hands and bluffs with few medium-strength holdings in between. Betting a polarized range forces the opponent into a binary decision \u2014 value or bluff \u2014 rather than letting them call comfortably with medium-strength hands. The bluff frequency in a balanced polarized range is set so the opponent is indifferent to calling: the bluff-to-value ratio mirrors the pot odds offered.",
       "featured_hand_strength": [
         "two_pair",
         "set",
@@ -25845,6 +25873,8 @@
       "id": "two-tone-king-board-top-pair",
       "name": "Two-tone king board: top pair",
       "description": "The flush draw missed and your top pair or set is the dominant hand \u2014 villain's range is capped at second pair with no draw to hide behind. Value bet comfortably; villain is stuck calling with second pair or worse.",
+      "concept": "Range Advantage",
+      "read_more": "Range advantage means your hand distribution is stronger than your opponent's on a specific board, giving you more strong hands relative to your overall range. Solvers exploit this by betting frequently and at larger sizes, since the opponent must defend a wide value range, not just the nuts. Failing to press range advantage \u2014 by checking too often or sizing too small \u2014 leaves significant EV on the table.",
       "featured_hand_strength": [
         "top_pair",
         "set"
@@ -27850,6 +27880,8 @@
       "id": "two-tone-queen-high-set-and-top-pair",
       "name": "Two-tone queen-high: set and top pair",
       "description": "With no flush possible on this board, your set or top pair is the best hand and villain holds weaker queens and underpairs. A small size extracts thin value \u2014 villain calls what they can beat but folds to a large overbet.",
+      "concept": "Thin Value",
+      "read_more": "Thin value betting means betting a hand that is only a small favorite against the opponent's calling range. The bet extracts chips from slightly worse hands that still call, while accepting the occasional loss to a better hand in villain's range. Sizing down is critical: a large bet for thin value folds out the weaker holdings you need to pay you off, turning a profitable spot into a break-even or losing one.",
       "featured_hand_strength": [
         "set",
         "top_pair"
@@ -29022,6 +29054,8 @@
       "id": "two-tone-ace-ten-two-pair",
       "name": "Two-tone ace-ten: two pair",
       "description": "Your two pair leads a dry board where villain holds mostly weaker aces and the occasional set \u2014 no flush or straight to fear. Pick your size based on what you want: a smaller bet gets called by weak aces, a larger bet extracts more from sets and gives up the marginal calls.",
+      "concept": "Thin Value",
+      "read_more": "Thin value betting means betting a hand that is only a small favorite against the opponent's calling range. The bet extracts chips from slightly worse hands that still call, while accepting the occasional loss to a better hand in villain's range. Sizing down is critical: a large bet for thin value folds out the weaker holdings you need to pay you off, turning a profitable spot into a break-even or losing one.",
       "featured_hand_strength": [
         "two_pair",
         "set"
@@ -30487,6 +30521,8 @@
       "id": "two-tone-jack-ten-two-pair",
       "name": "Two-tone jack-ten: two pair",
       "description": "The straight draw missed and your two pair is the top value hand on this connected board. Villain's weaker jacks and second pair have to call and pay you off \u2014 bet for value.",
+      "concept": "Thin Value",
+      "read_more": "Thin value betting means betting a hand that is only a small favorite against the opponent's calling range. The bet extracts chips from slightly worse hands that still call, while accepting the occasional loss to a better hand in villain's range. Sizing down is critical: a large bet for thin value folds out the weaker holdings you need to pay you off, turning a profitable spot into a break-even or losing one.",
       "featured_hand_strength": [
         "two_pair",
         "set"
@@ -31627,6 +31663,8 @@
       "id": "flush-possible-flush-vs-made-hands",
       "name": "Flush possible: flush vs made hands",
       "description": "When the flush completes, it becomes the nuts and every non-flush hand \u2014 two pair, sets, overpairs \u2014 becomes a bluff-catcher. Your flush bets for value; villain's strong non-flush hands can only hope you're bluffing.",
+      "concept": "Nut Advantage",
+      "read_more": "Nut advantage means holding a disproportionate share of the strongest possible hands on a given board. A player with nut advantage can bet large and frequently because even when called by strong hands, the opponent cannot raise without maximum exposure to the nuts. This advantage is most pronounced on flush and paired boards, where one player's range connects far more strongly with the runout.",
       "featured_hand_strength": [
         "flush"
       ],
@@ -33037,6 +33075,8 @@
       "id": "flush-board-nut-advantage",
       "name": "Flush board: nut advantage",
       "description": "On a flush board, the nut flush owns every smaller flush \u2014 villain's medium flushes are trapped and have to pay you off. Bet large; villain's smaller flushes can't fold and the bigger the size, the more you extract.",
+      "concept": "Nut Advantage",
+      "read_more": "Nut advantage means holding a disproportionate share of the strongest possible hands on a given board. A player with nut advantage can bet large and frequently because even when called by strong hands, the opponent cannot raise without maximum exposure to the nuts. This advantage is most pronounced on flush and paired boards, where one player's range connects far more strongly with the runout.",
       "featured_hand_strength": [
         "flush"
       ],
@@ -34555,6 +34595,8 @@
       "id": "king-high-flush-board",
       "name": "King-high flush board",
       "description": "Even a top set is just a bluff-catcher once the flush comes in \u2014 the made flush wins at showdown regardless of what else the board shows. Your flush bets for value while villain's sets and strong pairs are forced to call and hope you're bluffing.",
+      "concept": "Nut Advantage",
+      "read_more": "Nut advantage means holding a disproportionate share of the strongest possible hands on a given board. A player with nut advantage can bet large and frequently because even when called by strong hands, the opponent cannot raise without maximum exposure to the nuts. This advantage is most pronounced on flush and paired boards, where one player's range connects far more strongly with the runout.",
       "featured_hand_strength": [
         "flush"
       ],
@@ -35965,6 +36007,8 @@
       "id": "low-flush-board-nut-flush-vs-set",
       "name": "Low flush board: nut flush vs set",
       "description": "On a flush board, the nut flush and a set play completely different roles \u2014 the flush bets for value, the set can only bluff-catch. Know which role your hand plays and act accordingly.",
+      "concept": "Nut Advantage",
+      "read_more": "Nut advantage means holding a disproportionate share of the strongest possible hands on a given board. A player with nut advantage can bet large and frequently because even when called by strong hands, the opponent cannot raise without maximum exposure to the nuts. This advantage is most pronounced on flush and paired boards, where one player's range connects far more strongly with the runout.",
       "featured_hand_strength": [
         "flush",
         "set"
@@ -36998,6 +37042,8 @@
       "id": "broadway-flush-board",
       "name": "Broadway flush board",
       "description": "On a high flush board, your flush is the primary value hand \u2014 two pair and sets lose to any flush you hold. Your key decision is your flush's relative strength: the nut flush bets large, smaller flushes check more often.",
+      "concept": "Nut Advantage",
+      "read_more": "Nut advantage means holding a disproportionate share of the strongest possible hands on a given board. A player with nut advantage can bet large and frequently because even when called by strong hands, the opponent cannot raise without maximum exposure to the nuts. This advantage is most pronounced on flush and paired boards, where one player's range connects far more strongly with the runout.",
       "featured_hand_strength": [
         "flush",
         "two_pair",
@@ -38464,6 +38510,8 @@
       "id": "kqj-broadway-straights-and-two-pair",
       "name": "KQJ broadway: straights and two pair",
       "description": "On a K-Q-J board, the ace-ten broadway straight is the nuts and every strong hand below it \u2014 sets, overpairs, two pair \u2014 is a bluff-catcher against it. When you hold the straight, bet large; when villain raises on this board, the straight is heavily represented in their range.",
+      "concept": "Polarization",
+      "read_more": "A polarized betting range contains strong value hands and bluffs with few medium-strength holdings in between. Betting a polarized range forces the opponent into a binary decision \u2014 value or bluff \u2014 rather than letting them call comfortably with medium-strength hands. The bluff frequency in a balanced polarized range is set so the opponent is indifferent to calling: the bluff-to-value ratio mirrors the pot odds offered.",
       "featured_hand_strength": [
         "straight",
         "two_pair"
@@ -40469,6 +40517,8 @@
       "id": "ace-king-broadway-top-two-pair",
       "name": "Ace-king broadway: top two pair",
       "description": "Your top two pair or set dominates this board and villain is capped at single pair \u2014 no flush or straight threatens you. Bet for value; villain's one-pair hands are bluff-catching, not trapping.",
+      "concept": "Range Advantage",
+      "read_more": "Range advantage means your hand distribution is stronger than your opponent's on a specific board, giving you more strong hands relative to your overall range. Solvers exploit this by betting frequently and at larger sizes, since the opponent must defend a wide value range, not just the nuts. Failing to press range advantage \u2014 by checking too often or sizing too small \u2014 leaves significant EV on the table.",
       "featured_hand_strength": [
         "two_pair",
         "set"
@@ -42258,6 +42308,8 @@
       "id": "queen-jack-broadway-straights-sets-two-pair",
       "name": "Queen-jack broadway: straights, sets & two pair",
       "description": "Your range is polarized with straights, sets, and two pair, while villain holds weaker queens and has to call without knowing which value hand you hold. Bet large \u2014 any of your strong hands are ahead of most of what villain can call with.",
+      "concept": "Polarization",
+      "read_more": "A polarized betting range contains strong value hands and bluffs with few medium-strength holdings in between. Betting a polarized range forces the opponent into a binary decision \u2014 value or bluff \u2014 rather than letting them call comfortably with medium-strength hands. The bluff frequency in a balanced polarized range is set so the opponent is indifferent to calling: the bluff-to-value ratio mirrors the pot odds offered.",
       "featured_hand_strength": [
         "straight",
         "set",
@@ -43940,6 +43992,8 @@
       "id": "ace-queen-broadway-top-two-pair",
       "name": "Ace-queen broadway: top two pair",
       "description": "Your top two pair or set leads a board where villain is capped at single-pair hands \u2014 no hidden straights or flushes lurk. Value bet with confidence; villain's aces and queens are paying you off or folding.",
+      "concept": "Range Advantage",
+      "read_more": "Range advantage means your hand distribution is stronger than your opponent's on a specific board, giving you more strong hands relative to your overall range. Solvers exploit this by betting frequently and at larger sizes, since the opponent must defend a wide value range, not just the nuts. Failing to press range advantage \u2014 by checking too often or sizing too small \u2014 leaves significant EV on the table.",
       "featured_hand_strength": [
         "two_pair",
         "set"
@@ -45729,6 +45783,8 @@
       "id": "low-board-set-vs-straight-threat",
       "name": "Low board: set vs straight threat",
       "description": "Your set is strong on this low board, but the eight-six straight lurks in villain's range and beats you cleanly. Size carefully \u2014 a smaller bet gets value from worse pairs without building a pot you'd lose to the straight.",
+      "concept": "Thin Value",
+      "read_more": "Thin value betting means betting a hand that is only a small favorite against the opponent's calling range. The bet extracts chips from slightly worse hands that still call, while accepting the occasional loss to a better hand in villain's range. Sizing down is critical: a large bet for thin value folds out the weaker holdings you need to pay you off, turning a profitable spot into a break-even or losing one.",
       "featured_hand_strength": [
         "set"
       ],
@@ -47625,6 +47681,8 @@
       "id": "low-jack-high-big-pairs-out-of-position",
       "name": "Low jack-high: big pairs out of position",
       "description": "On this low, disconnected board your strong pairs are ahead of nearly everything villain holds \u2014 the board misses most of their range. Even underpairs extract thin value here; bet for what the board allows.",
+      "concept": "Thin Value",
+      "read_more": "Thin value betting means betting a hand that is only a small favorite against the opponent's calling range. The bet extracts chips from slightly worse hands that still call, while accepting the occasional loss to a better hand in villain's range. Sizing down is critical: a large bet for thin value folds out the weaker holdings you need to pay you off, turning a profitable spot into a break-even or losing one.",
       "featured_hand_strength": [
         "overpair",
         "underpair",
@@ -49901,6 +49959,8 @@
       "id": "low-paired-board-full-house-vs-trips",
       "name": "Low paired board: full house vs trips",
       "description": "Your full house looks dominant, but villain's range hides its own full houses and trips that beat you. Bet for value, but treat a raise as a warning \u2014 villain's calling range on a paired low board is much stronger than it appears.",
+      "concept": "Thin Value",
+      "read_more": "Thin value betting means betting a hand that is only a small favorite against the opponent's calling range. The bet extracts chips from slightly worse hands that still call, while accepting the occasional loss to a better hand in villain's range. Sizing down is critical: a large bet for thin value folds out the weaker holdings you need to pay you off, turning a profitable spot into a break-even or losing one.",
       "featured_hand_strength": [
         "full_house",
         "two_pair"
@@ -51744,6 +51804,8 @@
       "id": "3-bet-pot-dry-ace-high",
       "name": "3-bet pot, dry ace-high",
       "description": "In a 3-bet pot, your nut advantage is at its most powerful \u2014 inflated pot sizes mean each bet applies maximum pressure to villain's underpairs and weaker aces. Size up aggressively; the big pot rewards value betting and makes villain's marginal hands extremely difficult to call.",
+      "concept": "Range Advantage",
+      "read_more": "Range advantage means your hand distribution is stronger than your opponent's on a specific board, giving you more strong hands relative to your overall range. Solvers exploit this by betting frequently and at larger sizes, since the opponent must defend a wide value range, not just the nuts. Failing to press range advantage \u2014 by checking too often or sizing too small \u2014 leaves significant EV on the table.",
       "featured_hand_strength": [
         "two_pair",
         "set",
@@ -53480,6 +53542,8 @@
       "id": "3-bet-pot-low-board-big-hands-vs-sets",
       "name": "3-bet pot, low board: big hands vs sets",
       "description": "In a 3-bet pot on a low board, villain's range frequently contains flopped sets that crush your overpairs \u2014 the big pot makes those mistakes very costly. Value bet the nutted hands confidently, but respect a raise; villain's set is live on this texture.",
+      "concept": "Bluff Catching",
+      "read_more": "Bluff catching means calling down with a hand that loses to all value bets but beats all bluffs. The decision is driven by pot odds and the estimated frequency villain bluffs: if villain bluffs more often than the break-even frequency implied by the pot odds, calling is profitable regardless of hand strength. Bluff catchers should rarely raise, because raising prices out the bluffs you're trying to capture and only gets called by better.",
       "featured_hand_strength": [
         "overpair",
         "set",
@@ -55864,6 +55928,8 @@
       "id": "3-bet-pot-paired-ace-river-trips",
       "name": "3-bet pot, paired ace river: trips",
       "description": "The river pairing the ace gives your trips a dominant position in this bloated pot \u2014 villain's overpairs are stuck bluff-catching with no way to raise profitably. Extract maximum value at a large size; villain's options narrow to call or fold.",
+      "concept": "Nut Advantage",
+      "read_more": "Nut advantage means holding a disproportionate share of the strongest possible hands on a given board. A player with nut advantage can bet large and frequently because even when called by strong hands, the opponent cannot raise without maximum exposure to the nuts. This advantage is most pronounced on flush and paired boards, where one player's range connects far more strongly with the runout.",
       "featured_hand_strength": [
         "trips",
         "full_house",
@@ -57600,6 +57666,8 @@
       "id": "3-bet-pot-broadway-top-two-pair",
       "name": "3-bet pot, broadway: top two pair",
       "description": "In a 3-bet pot on a broadway board, your top two pair is the best made hand and villain is capped at weaker two pair or one pair. Press the advantage \u2014 the large pot rewards value betting, and villain can't reasonably fold to a standard bet.",
+      "concept": "Range Advantage",
+      "read_more": "Range advantage means your hand distribution is stronger than your opponent's on a specific board, giving you more strong hands relative to your overall range. Solvers exploit this by betting frequently and at larger sizes, since the opponent must defend a wide value range, not just the nuts. Failing to press range advantage \u2014 by checking too often or sizing too small \u2014 leaves significant EV on the table.",
       "featured_hand_strength": [
         "two_pair"
       ],
@@ -59334,6 +59402,8 @@
       "id": "3-bet-pot-two-tone-top-two-and-strong-pairs",
       "name": "3-bet pot, two-tone: top two and strong pairs",
       "description": "After the draw bricks, both you and villain hold strong made hands in this bloated pot \u2014 but your top two pair and sets sit at the top of both ranges. In a spot where both sides are strong, the player with the slightly better range at the top wins; that's you.",
+      "concept": "Range Advantage",
+      "read_more": "Range advantage means your hand distribution is stronger than your opponent's on a specific board, giving you more strong hands relative to your overall range. Solvers exploit this by betting frequently and at larger sizes, since the opponent must defend a wide value range, not just the nuts. Failing to press range advantage \u2014 by checking too often or sizing too small \u2014 leaves significant EV on the table.",
       "featured_hand_strength": [
         "two_pair",
         "set",
