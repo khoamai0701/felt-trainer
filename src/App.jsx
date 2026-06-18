@@ -362,8 +362,8 @@ function _actRgb(actKey) {
   return _ACT_RGB[actKey.split(" ")[0]] || _ACT_RGB.check;
 }
 
-function RangePanel({ range }) {
-  const [open, setOpen] = useState(false);
+function RangePanel({ range, defaultOpen = false }) {
+  const [open, setOpen] = useState(defaultOpen);
 
   // Aggregate per-class: average action frequencies across combos of the same class.
   const classMap = {};
@@ -559,6 +559,312 @@ function RangeChart() {
   );
 }
 
+/* ================== SOLVE TAB ================== */
+function SolveTab() {
+  const [board, setBoard] = useState(Array(5).fill(null));
+  const [pickingSlot, setPickingSlot] = useState(null);
+  const [pickRank, setPickRank] = useState(null);
+  const [oopRange, setOopRange] = useState(new Set());
+  const [ipRange, setIpRange] = useState(new Set());
+  const [activeRange, setActiveRange] = useState("oop");
+  const [pot, setPot] = useState(100);
+  const [betFracs, setBetFracs] = useState(new Set([0.5, 1.0]));
+  const [solving, setSolving] = useState(false);
+  const [result, setResult] = useState(null);
+  const [error, setError] = useState(null);
+  const [solveHistKey, setSolveHistKey] = useState("root");
+
+  const usedCards = new Set(board.filter(Boolean));
+  const boardFull = board.filter(Boolean).length === 5;
+
+  const classSize = (cls) => (cls.length === 2 ? 6 : cls.endsWith("s") ? 4 : 12);
+  const rangePct = (r) =>
+    Math.round([...r].reduce((s, cls) => s + classSize(cls), 0) / 1326 * 100);
+
+  const toggleClass = (cls) => {
+    const setter = activeRange === "oop" ? setOopRange : setIpRange;
+    setter((prev) => {
+      const next = new Set(prev);
+      next.has(cls) ? next.delete(cls) : next.add(cls);
+      return next;
+    });
+  };
+
+  const activeSet = activeRange === "oop" ? oopRange : ipRange;
+  const rangeGrid = [];
+  for (let r = 0; r < 13; r++) {
+    const row = [];
+    for (let c = 0; c < 13; c++) {
+      const rA = RANKS[12 - r], rB = RANKS[12 - c];
+      let cls;
+      if (r === c) cls = rA + rA;
+      else if (c > r) cls = rA + rB + "s";
+      else cls = rB + rA + "o";
+      row.push({ cls, on: activeSet.has(cls) });
+    }
+    rangeGrid.push(row);
+  }
+
+  const handleSolve = async () => {
+    if (!boardFull) { setError("Select all 5 board cards first."); return; }
+    if (oopRange.size === 0) { setError("OOP range is empty."); return; }
+    if (ipRange.size === 0) { setError("IP range is empty."); return; }
+    if (betFracs.size === 0) { setError("Select at least one bet size."); return; }
+    if (!(pot > 0)) { setError("Pot must be a positive number."); return; }
+    setSolving(true); setError(null); setResult(null);
+    try {
+      const resp = await fetch("http://localhost:8000/solve", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          board,
+          oop_range: [...oopRange],
+          ip_range: [...ipRange],
+          pot,
+          bet_fractions: [...betFracs].sort((a, b) => a - b),
+          iterations: 500,
+        }),
+      });
+      if (!resp.ok) {
+        const e = await resp.json().catch(() => ({}));
+        throw new Error(e.detail || `Server error ${resp.status}`);
+      }
+      const data = await resp.json();
+      setResult(data);
+      setSolveHistKey("root");
+    } catch (e) {
+      setError(
+        e.message === "Failed to fetch"
+          ? "Backend unreachable. Start it with: uvicorn api:app --reload (in the poker-solver directory)"
+          : e.message
+      );
+    } finally {
+      setSolving(false);
+    }
+  };
+
+  const buildSolveRange = (data, hk) => {
+    const table = data?.strategies?.OOP?.[hk];
+    if (!table) return [];
+    return Object.entries(table)
+      .filter(([, d]) => d.reached)
+      .sort(([, a], [, b]) => b.strength - a.strength)
+      .map(([combo, d]) => ({
+        combo,
+        cards: [combo.slice(0, 2), combo.slice(2)],
+        hand_class: d.hand_class,
+        actions: d.actions,
+      }));
+  };
+
+  const RANK_LIST = "AKQJT98765432".split("");
+  const SUIT_LIST = ["s", "h", "d", "c"];
+  const labelStyle = {
+    fontSize: 12, fontWeight: 700, color: T.creamDim,
+    letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 10,
+  };
+
+  return (
+    <div>
+      {/* ── Board ── */}
+      <div style={{ marginBottom: 24 }}>
+        <div style={labelStyle}>Board</div>
+        <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+          {board.map((card, idx) => (
+            <div key={idx} onClick={() => {
+              if (card) { setBoard((b) => b.map((c, i) => i === idx ? null : c)); return; }
+              setPickingSlot(idx); setPickRank(null);
+            }} style={{
+              width: 48, height: 64, borderRadius: 8, cursor: "pointer",
+              border: `2px solid ${pickingSlot === idx ? T.brass : T.feltLine}`,
+              background: card ? "rgba(255,255,255,0.05)" : "rgba(255,255,255,0.02)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+            }}>
+              {card ? <Card c={card} /> : <span style={{ color: T.feltLine, fontSize: 22, fontWeight: 300 }}>+</span>}
+            </div>
+          ))}
+          {board.some(Boolean) && (
+            <button onClick={() => { setBoard(Array(5).fill(null)); setPickingSlot(null); setPickRank(null); }}
+              style={{ background: "none", border: "none", color: T.creamDim, cursor: "pointer", fontSize: 12 }}>
+              clear
+            </button>
+          )}
+        </div>
+
+        {pickingSlot !== null && (
+          <div style={{ marginTop: 10, background: T.feltDeep, border: `1px solid ${T.feltLine}`, borderRadius: 10, padding: 12, maxWidth: 380 }}>
+            {pickRank === null ? (
+              <div>
+                <div style={{ fontSize: 11, color: T.creamDim, marginBottom: 8, display: "flex", justifyContent: "space-between" }}>
+                  <span>Pick rank</span>
+                  <button onClick={() => setPickingSlot(null)} style={{ background: "none", border: "none", color: T.creamDim, cursor: "pointer", fontSize: 11 }}>cancel</button>
+                </div>
+                <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
+                  {RANK_LIST.map((rank) => (
+                    <button key={rank} onClick={() => setPickRank(rank)} style={{
+                      width: 34, height: 34, borderRadius: 6, border: `1px solid ${T.feltLine}`,
+                      background: "rgba(255,255,255,0.06)", color: T.cream, cursor: "pointer",
+                      fontSize: 14, fontWeight: 700, fontFamily: "'Space Grotesk', monospace",
+                    }}>{rank === "T" ? "10" : rank}</button>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div>
+                <div style={{ fontSize: 11, color: T.creamDim, marginBottom: 8, display: "flex", justifyContent: "space-between" }}>
+                  <span>Pick suit for {pickRank === "T" ? "10" : pickRank}</span>
+                  <button onClick={() => setPickRank(null)} style={{ background: "none", border: "none", color: T.creamDim, cursor: "pointer", fontSize: 11 }}>← back</button>
+                </div>
+                <div style={{ display: "flex", gap: 8 }}>
+                  {SUIT_LIST.map((suit) => {
+                    const card = pickRank + suit;
+                    const used = usedCards.has(card);
+                    return (
+                      <button key={suit} onClick={() => {
+                        if (used) return;
+                        setBoard((b) => b.map((c, i) => i === pickingSlot ? card : c));
+                        setPickingSlot(null); setPickRank(null);
+                      }} style={{
+                        width: 46, height: 46, borderRadius: 8, fontSize: 22, fontWeight: 700,
+                        border: `1px solid ${used ? "transparent" : T.feltLine}`,
+                        background: used ? "rgba(255,255,255,0.02)" : "rgba(255,255,255,0.07)",
+                        color: used ? "rgba(246,241,227,0.15)" : SUITS[suit].color,
+                        cursor: used ? "default" : "pointer",
+                      }}>{SUITS[suit].sym}</button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* ── Ranges ── */}
+      <div style={{ marginBottom: 24 }}>
+        <div style={labelStyle}>Ranges</div>
+        <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
+          {[["oop", "OOP"], ["ip", "IP"]].map(([k, label]) => {
+            const r = k === "oop" ? oopRange : ipRange;
+            const active = activeRange === k;
+            return (
+              <button key={k} onClick={() => setActiveRange(k)} style={{
+                padding: "6px 14px", borderRadius: 999, fontSize: 13, fontWeight: 700, cursor: "pointer",
+                fontFamily: "'Space Grotesk', sans-serif",
+                border: `1px solid ${active ? T.brass : T.feltLine}`,
+                background: active ? "rgba(216,169,61,0.14)" : "transparent",
+                color: active ? T.brass : T.creamDim,
+              }}>{label} · {rangePct(r)}%</button>
+            );
+          })}
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(13, 1fr)", gap: 2, maxWidth: 560 }}>
+          {rangeGrid.flat().map((cell, idx) => (
+            <div key={idx} onClick={() => toggleClass(cell.cls)} title={cell.cls} style={{
+              aspectRatio: "1", display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: "clamp(6px, 1.6vw, 10.5px)", borderRadius: 3, fontWeight: 700,
+              fontFamily: "'Space Grotesk', monospace", cursor: "pointer", userSelect: "none",
+              background: cell.on ? T.brass : "rgba(255,255,255,0.05)",
+              color: cell.on ? T.ink : "rgba(246,241,227,0.35)",
+            }}>{cell.cls}</div>
+          ))}
+        </div>
+        <div style={{ marginTop: 8, fontSize: 11, color: T.creamDim, lineHeight: 1.6, maxWidth: 560 }}>
+          {activeRange === "oop" ? "OOP" : "IP"}: {
+            [...(activeRange === "oop" ? oopRange : ipRange)]
+              .sort((a, b) => RANKS.indexOf(b[0]) - RANKS.indexOf(a[0]))
+              .join(", ") || "none selected"
+          }
+        </div>
+      </div>
+
+      {/* ── Pot & bet sizes ── */}
+      <div style={{ marginBottom: 24 }}>
+        <div style={labelStyle}>Pot & bet sizes</div>
+        <div style={{ display: "flex", gap: 20, alignItems: "center", flexWrap: "wrap", marginBottom: 12 }}>
+          <label style={{ fontSize: 13, color: T.creamDim, display: "flex", alignItems: "center", gap: 8 }}>
+            Pot
+            <input type="number" value={pot} min={1} max={99999}
+              onChange={(e) => setPot(Number(e.target.value))}
+              style={{
+                width: 80, padding: "5px 8px", borderRadius: 6, border: `1px solid ${T.feltLine}`,
+                background: "rgba(255,255,255,0.06)", color: T.cream, fontSize: 14,
+                fontFamily: "'Space Grotesk', monospace", outline: "none",
+              }}
+            />
+          </label>
+        </div>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          {[[0.25, "25%"], [0.5, "50%"], [0.75, "75%"], [1.0, "100%"], [1.5, "150%"]].map(([frac, label]) => {
+            const on = betFracs.has(frac);
+            return (
+              <button key={frac} onClick={() => setBetFracs((prev) => {
+                const next = new Set(prev);
+                on ? next.delete(frac) : next.add(frac);
+                return next;
+              })} style={{
+                padding: "6px 14px", borderRadius: 999, fontSize: 13, fontWeight: 700, cursor: "pointer",
+                fontFamily: "'Space Grotesk', sans-serif",
+                border: `1px solid ${on ? T.green : T.feltLine}`,
+                background: on ? "rgba(63,160,106,0.15)" : "transparent",
+                color: on ? T.green : T.creamDim,
+              }}>{label}</button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ── Solve button ── */}
+      <button onClick={handleSolve} disabled={solving} style={{
+        width: "100%", padding: "14px 0", borderRadius: 12, fontSize: 16, fontWeight: 800,
+        cursor: solving ? "wait" : "pointer",
+        fontFamily: "'Bricolage Grotesque', sans-serif",
+        background: solving ? "rgba(216,169,61,0.4)" : T.brass,
+        color: T.ink, border: "none",
+        boxShadow: solving ? "none" : `0 4px 0 ${T.brassDeep}`,
+      }}>
+        {solving ? "Solving… (500 iterations)" : "Solve →"}
+      </button>
+
+      {/* ── Error ── */}
+      {error && (
+        <div style={{ marginTop: 12, padding: "10px 14px", borderRadius: 8, fontSize: 13,
+          background: "rgba(214,69,65,0.12)", border: `1px solid ${T.red}`, color: T.red }}>
+          {error}
+        </div>
+      )}
+
+      {/* ── Result ── */}
+      {result && !solving && (
+        <div style={{ marginTop: 24 }}>
+          <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginBottom: 12 }}>
+            <span style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontSize: 18, fontWeight: 800, color: T.cream }}>
+              OOP strategy
+            </span>
+            <span style={{ fontSize: 12, color: T.creamDim }}>
+              {result.iterations} iter · EV: OOP {result.expected_pot_share?.OOP}% / IP {result.expected_pot_share?.IP}%
+            </span>
+          </div>
+          {Object.keys(result.strategies?.OOP || {}).length > 1 && (
+            <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 10 }}>
+              {Object.keys(result.strategies.OOP).map((hk) => (
+                <button key={hk} onClick={() => setSolveHistKey(hk)} style={{
+                  padding: "5px 12px", borderRadius: 999, fontSize: 12, fontWeight: 700, cursor: "pointer",
+                  fontFamily: "'Space Grotesk', sans-serif",
+                  border: `1px solid ${hk === solveHistKey ? T.brass : T.feltLine}`,
+                  background: hk === solveHistKey ? "rgba(216,169,61,0.14)" : "transparent",
+                  color: hk === solveHistKey ? T.brass : T.creamDim,
+                }}>{hk}</button>
+              ))}
+            </div>
+          )}
+          <RangePanel range={buildSolveRange(result, solveHistKey)} defaultOpen />
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* ================== LESSON LOGIC ================== */
 function buildLesson() {
   // The 3 "curated" slots now draw from a pool of real solver-derived river
@@ -637,7 +943,7 @@ export default function App() {
 
       {/* Tabs */}
       <div style={{ maxWidth: 680, margin: "0 auto", padding: "0 16px", display: "flex", gap: 8, marginBottom: 14 }}>
-        {[["train", "Train"], ["ranges", "Ranges"]].map(([k, label]) => (
+        {[["train", "Train"], ["ranges", "Ranges"], ["solve", "Solve"]].map(([k, label]) => (
           <button key={k} onClick={() => setTab(k)} style={{
             padding: "7px 16px", borderRadius: 999, fontSize: 13, fontWeight: 700, cursor: "pointer",
             fontFamily: "'Space Grotesk', sans-serif",
@@ -650,6 +956,7 @@ export default function App() {
 
       <div style={{ maxWidth: 680, margin: "0 auto", padding: "0 16px 60px" }}>
         {tab === "ranges" && <RangeChart />}
+        {tab === "solve" && <SolveTab />}
 
         {tab === "train" && phase === "home" && (
           <div style={{ textAlign: "center", paddingTop: 40 }}>
