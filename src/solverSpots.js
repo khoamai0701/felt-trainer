@@ -204,6 +204,17 @@ function buildSpot(spot) {
     freq: Math.round(f * 100),
   }));
 
+  // All reached OOP combos at this node, sorted strongest first, for the range panel.
+  const range = Object.entries(spot.strategies[hero][historyKey])
+    .filter(([, d]) => d.reached)
+    .sort(([, a], [, b]) => b.strength - a.strength)
+    .map(([combo, d]) => ({
+      combo,
+      cards: parseCombo(combo),
+      hand_class: d.hand_class,
+      actions: d.actions,
+    }));
+
   return {
     kind: "river",
     solver: true, // marks the spot as real solver data (vs hand-written)
@@ -218,6 +229,7 @@ function buildSpot(spot) {
     explain: explainFor(spot, comboName, comboData, options),
     concept: spot.concept,
     read_more: riverReadMore(spot, historyKey, comboData),
+    range,
   };
 }
 

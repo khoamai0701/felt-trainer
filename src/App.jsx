@@ -336,6 +336,72 @@ function ReadMore({ text }) {
   );
 }
 
+/* ================== RANGE PANEL ================== */
+// Collapsible grid of all OOP combos at the current decision node.
+// Only rendered for solver river spots (spot.solver && spot.range).
+function RangePanel({ range }) {
+  const [open, setOpen] = useState(false);
+
+  const segColor = (act) => {
+    if (act === "fold") return T.red;
+    if (act === "check" || act === "call") return "rgba(246,241,227,0.22)";
+    if (act.startsWith("bet")) return T.green;
+    return T.brass; // raise
+  };
+
+  return (
+    <div style={{ marginTop: 10 }}>
+      <button
+        onClick={() => setOpen((o) => !o)}
+        style={{
+          width: "100%", background: "none", border: `1px solid ${T.feltLine}`,
+          borderRadius: 8, padding: "7px 14px", cursor: "pointer",
+          fontSize: 12, color: T.creamDim, fontFamily: "'Space Grotesk', sans-serif",
+          textAlign: "left",
+        }}
+      >
+        {open ? "Hide range ↑" : "See full range ↓"}
+        <span style={{ opacity: 0.5, marginLeft: 8 }}>{range.length} combos · bet=green check=grey fold=red</span>
+      </button>
+      {open && (
+        <div style={{
+          marginTop: 6, maxHeight: 340, overflowY: "auto",
+          background: "rgba(0,0,0,0.2)", borderRadius: 10,
+          border: `1px solid ${T.feltLine}`,
+        }}>
+          {range.map((row) => (
+            <div key={row.combo} style={{
+              display: "grid", gridTemplateColumns: "80px 1fr 110px",
+              alignItems: "center", gap: 10, padding: "5px 12px",
+              borderBottom: `1px solid rgba(255,255,255,0.04)`,
+            }}>
+              <span style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontWeight: 700, fontSize: 13 }}>
+                {row.cards.map((c, i) => (
+                  <span key={i} style={{ color: SUITS[c[1]].color }}>
+                    {(c[0] === "T" ? "10" : c[0])}{SUITS[c[1]].sym}{i === 0 ? " " : ""}
+                  </span>
+                ))}
+              </span>
+              <span style={{ fontSize: 11, color: T.creamDim }}>{row.hand_class}</span>
+              <div style={{ display: "flex", height: 7, borderRadius: 4, overflow: "hidden" }}>
+                {Object.entries(row.actions).map(([act, freq]) =>
+                  freq > 0.01 ? (
+                    <div
+                      key={act}
+                      title={`${act}: ${Math.round(freq * 100)}%`}
+                      style={{ flex: freq, background: segColor(act) }}
+                    />
+                  ) : null
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* ================== TABLE PANEL ================== */
 function TablePanel({ spot }) {
   if (spot.stat) {
@@ -617,6 +683,7 @@ export default function App() {
                   </div>
                 )}
                 <p style={{ fontSize: 14.5, lineHeight: 1.65, color: T.cream, opacity: 0.92 }}>{spot.explain}</p>
+                {spot.solver && spot.range && <RangePanel range={spot.range} />}
                 <button onClick={next} style={{
                   marginTop: 12, width: "100%", background: T.brass, color: T.ink, border: "none",
                   borderRadius: 12, padding: "15px", fontSize: 16, fontWeight: 800, cursor: "pointer",
