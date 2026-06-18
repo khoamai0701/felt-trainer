@@ -337,17 +337,67 @@ function ReadMore({ text }) {
 }
 
 /* ================== RANGE PANEL ================== */
-// Collapsible grid of all OOP combos at the current decision node.
+// Collapsible 13x13 hand-matrix grid showing OOP solver frequencies.
 // Only rendered for solver river spots (spot.solver && spot.range).
+
+// "AsKs" → "AKs",  "AsKd" → "AKo",  "AsAd" → "AA"
+// Combos are canonical (high rank first), so c1 rank >= c2 rank always.
+function _comboClass(comboName) {
+  const r1 = comboName[0], s1 = comboName[1];
+  const r2 = comboName[2], s2 = comboName[3];
+  if (r1 === r2) return r1 + r2;
+  return r1 + r2 + (s1 === s2 ? "s" : "o");
+}
+
+// RGB triples for action categories (matches T theme colours).
+const _ACT_RGB = {
+  bet:   [63, 160, 106],   // T.green
+  raise: [63, 160, 106],
+  fold:  [214, 69, 65],    // T.red
+  check: [207, 200, 180],  // T.creamDim
+  call:  [207, 200, 180],
+};
+
+function _actRgb(actKey) {
+  return _ACT_RGB[actKey.split(" ")[0]] || _ACT_RGB.check;
+}
+
 function RangePanel({ range }) {
   const [open, setOpen] = useState(false);
 
-  const segColor = (act) => {
-    if (act === "fold") return T.red;
-    if (act === "check" || act === "call") return "rgba(246,241,227,0.22)";
-    if (act.startsWith("bet")) return T.green;
-    return T.brass; // raise
-  };
+  // Aggregate per-class: average action frequencies across combos of the same class.
+  const classMap = {};
+  for (const row of range) {
+    const cls = _comboClass(row.combo);
+    if (!classMap[cls]) classMap[cls] = [];
+    classMap[cls].push(row.actions);
+  }
+  const classData = {};
+  for (const [cls, actionsList] of Object.entries(classMap)) {
+    const agg = {};
+    for (const actions of actionsList)
+      for (const [act, f] of Object.entries(actions))
+        agg[act] = (agg[act] || 0) + f;
+    const n = actionsList.length;
+    const avg = Object.fromEntries(Object.entries(agg).map(([a, f]) => [a, f / n]));
+    const [dom, domFreq] = Object.entries(avg).sort(([, a], [, b]) => b - a)[0];
+    classData[cls] = { avg, dom, domFreq };
+  }
+
+  // Build 13x13 grid (same coordinate system as RangeChart).
+  const grid = [];
+  for (let r = 0; r < 13; r++) {
+    const row = [];
+    for (let c = 0; c < 13; c++) {
+      const rA = RANKS[12 - r], rB = RANKS[12 - c];
+      let cls;
+      if (r === c) cls = rA + rA;
+      else if (c > r) cls = rA + rB + "s";
+      else cls = rB + rA + "o";
+      row.push({ cls, data: classData[cls] || null });
+    }
+    grid.push(row);
+  }
 
   return (
     <div style={{ marginTop: 10 }}>
@@ -364,38 +414,35 @@ function RangePanel({ range }) {
         <span style={{ opacity: 0.5, marginLeft: 8 }}>{range.length} combos · bet=green check=grey fold=red</span>
       </button>
       {open && (
-        <div style={{
-          marginTop: 6, maxHeight: 340, overflowY: "auto",
-          background: "rgba(0,0,0,0.2)", borderRadius: 10,
-          border: `1px solid ${T.feltLine}`,
-        }}>
-          {range.map((row) => (
-            <div key={row.combo} style={{
-              display: "grid", gridTemplateColumns: "80px 1fr 110px",
-              alignItems: "center", gap: 10, padding: "5px 12px",
-              borderBottom: `1px solid rgba(255,255,255,0.04)`,
-            }}>
-              <span style={{ fontFamily: "'Bricolage Grotesque', sans-serif", fontWeight: 700, fontSize: 13 }}>
-                {row.cards.map((c, i) => (
-                  <span key={i} style={{ color: SUITS[c[1]].color }}>
-                    {(c[0] === "T" ? "10" : c[0])}{SUITS[c[1]].sym}{i === 0 ? " " : ""}
-                  </span>
-                ))}
-              </span>
-              <span style={{ fontSize: 11, color: T.creamDim }}>{row.hand_class}</span>
-              <div style={{ display: "flex", height: 7, borderRadius: 4, overflow: "hidden" }}>
-                {Object.entries(row.actions).map(([act, freq]) =>
-                  freq > 0.01 ? (
-                    <div
-                      key={act}
-                      title={`${act}: ${Math.round(freq * 100)}%`}
-                      style={{ flex: freq, background: segColor(act) }}
-                    />
-                  ) : null
-                )}
-              </div>
-            </div>
-          ))}
+        <div style={{ marginTop: 8 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(13, 1fr)", gap: 2 }}>
+            {grid.flat().map((cell, idx) => {
+              const { cls, data } = cell;
+              let bg, textColor;
+              if (data) {
+                const [r, g, b] = _actRgb(data.dom);
+                const alpha = Math.max(data.domFreq, 0.25);
+                bg = `rgba(${r},${g},${b},${alpha})`;
+                textColor = T.cream;
+              } else {
+                bg = "rgba(255,255,255,0.04)";
+                textColor = "rgba(246,241,227,0.12)";
+              }
+              const tip = data
+                ? `${cls}: ${data.dom} ${Math.round(data.domFreq * 100)}%`
+                : `${cls} (not in range)`;
+              return (
+                <div key={idx} title={tip} style={{
+                  aspectRatio: "1", display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: "clamp(6px, 1.6vw, 10.5px)", borderRadius: 3, fontWeight: 700,
+                  fontFamily: "'Space Grotesk', monospace",
+                  background: bg, color: textColor,
+                }}>
+                  {cls}
+                </div>
+              );
+            })}
+          </div>
         </div>
       )}
     </div>
