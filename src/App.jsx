@@ -613,7 +613,8 @@ function SolveTab() {
     if (!(pot > 0)) { setError("Pot must be a positive number."); return; }
     setSolving(true); setError(null); setResult(null);
     try {
-      const resp = await fetch("http://localhost:8000/solve", {
+      const SOLVER_URL = import.meta.env.VITE_SOLVER_URL ?? "http://localhost:8000";
+      const resp = await fetch(`${SOLVER_URL}/solve`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -635,7 +636,7 @@ function SolveTab() {
     } catch (e) {
       setError(
         e.message === "Failed to fetch"
-          ? "Backend unreachable. Start it with: uvicorn api:app --reload (in the poker-solver directory)"
+          ? "Backend unreachable. If running locally, start with: uvicorn api:app --reload"
           : e.message
       );
     } finally {
@@ -815,6 +816,9 @@ function SolveTab() {
       </div>
 
       {/* ── Solve button ── */}
+      <div style={{ fontSize: 11, color: T.creamDim, marginBottom: 8, opacity: 0.7 }}>
+        First request may take up to a minute while the server wakes up.
+      </div>
       <button onClick={handleSolve} disabled={solving} style={{
         width: "100%", padding: "14px 0", borderRadius: 12, fontSize: 16, fontWeight: 800,
         cursor: solving ? "wait" : "pointer",
